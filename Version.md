@@ -44,3 +44,31 @@
   - Identified hardcoded offline lockout mechanism inside `LongScreenshotSplash.onCreate`.
   - Mapped proprietary stitching logic in `h3.i` and frame pipeline in `l3.e` and `ScreenshotViewService`.
   - Formulated full Material 3 Expressive and offline-first replacement specification.
+
+
+---
+
+### [Feature Implementation: Long Shot PDF Engine] - 2026-11-13 14:30:00 IST
+- **Status:** Completed (100%)
+- **Target SDK:** 35 (Android 15)
+- **Min SDK:** 26 (Android 8.0)
+- **Compile SDK:** 35
+- **Libraries & Architecture:**
+  - Kotlin 2.0.21 + Jetpack Compose BOM 2024.10.01 + Material 3 1.3.1
+  - StateFlow + collectAsStateWithLifecycle (UDF Architecture)
+  - Pure Native Android Canvas & PdfDocument Pipeline (Zero third-party bloat)
+- **Bloat Removal & Feature Pruning (Without Breaking Core Workflow):**
+  - Completely eradicated: "My creation" gallery, separate "Share" activity, "Summer policy" & company tracking, Google Play referral icon/link, floating screen capture overlay service, and Web capture.
+  - 100% Focused on the core workflow: **Long Screenshot -> Seamless Long PDF Conversion Engine**.
+- **Display Insets & Scaling Rectification:**
+  - Fixed status bar and gesture navigation bar clipping by implementing full edge-to-edge support with `enableEdgeToEdge()`, `Scaffold`, `statusBarsPadding()`, and `navigationBarsPadding()`.
+  - Zero overlay on display cutout / camera punch hole on Realme 11 5G.
+- **Components Implemented:**
+  - `PdfConverterEngine`: Dual-mode conversion pipeline supporting:
+    - *Seamless Single-Page Canvas*: Continuous dynamic height matching exact screenshot dimensions (zero page cuts, infinite scroll).
+    - *Paginated A4 Canvas*: Clean margin slicing for standard physical prints.
+    - OOM-safe bitmap decoding with sample size calculations for ultra-tall captures on 4GB RAM devices.
+  - `PdfViewModel`: Reactive state manager handling single and batch screenshot ingestion, image dimension inspection, and asynchronous IO PDF rendering.
+  - `HomeScreen`: M3 Expressive UI with 5-tier Surface Container hierarchy, tactile geometry, source image bento card, live progress feedback, and post-generation open/save sheet.
+  - `MainActivity`: Single-activity entry point with incoming `ACTION_SEND` and `ACTION_SEND_MULTIPLE` intent ingestion.
+  - CI/CD Pipelines: Added `.github/workflows/ci.yml` and `.github/workflows/release.yml` with semantic versioning tag alignment.
