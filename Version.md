@@ -33,3 +33,14 @@
     - `ViewPageOnInternet`: Full web page DOM canvas screenshot capture via WebView.
     - `MyCreationActivity` & `MyScreenshotView`: Scoped storage gallery with PhotoView zoom and PDF export.
   - Architectural Modernization Blueprint: Designed complete Material 3 Expressive pure native Jetpack Compose architecture (100% offline, zero ads, zero telemetry, scoped MediaStore integration, M3 Expressive dynamic color palette for Realme 11 5G).
+
+
+---
+
+### [Documentation & Forensic Mapping] - 2026-11-13 14:02:00 IST
+- **Status:** Completed (100%)
+- **Components Documented:**
+  - `docs/app-map-long-screenshot.md`: Complete architectural breakdown, opcode mapping, failure mode diagnosis, and modernization roadmap for Long Screenshot Capture & Edit (`com.longscreenshotcapture.stitchingscreenshot.longshot.summerllc`).
+  - Identified hardcoded offline lockout mechanism inside `LongScreenshotSplash.onCreate`.
+  - Mapped proprietary stitching logic in `h3.i` and frame pipeline in `l3.e` and `ScreenshotViewService`.
+  - Formulated full Material 3 Expressive and offline-first replacement specification.
