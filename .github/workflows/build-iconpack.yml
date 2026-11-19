@@ -4,11 +4,11 @@ on:
   workflow_dispatch:
     inputs:
       apk_url:
-        description: 'Direct download URL for base Pix Material You APK'
+        description: 'Direct download URL for base Pix Material You APK (leave empty to use default release base.apk)'
         required: false
         default: ''
       create_release:
-        description: 'Publish as a GitHub Release (v6.1.6)'
+        description: 'Publish/Attach to GitHub Release'
         type: boolean
         default: true
       release_tag:
@@ -50,6 +50,8 @@ jobs:
 
       - name: Acquire Base APK
         id: acquire-apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if [ -n "${{ inputs.apk_url }}" ]; then
             echo "Downloading base APK from input URL..."
@@ -57,13 +59,12 @@ jobs:
           elif [ -f "base.apk" ]; then
             echo "Using base.apk from repository root."
           else
-            # Check if there is an existing release asset or fail gracefully
-            echo "Searching for APK in release or environment..."
-            if command -v gh &> /dev/null; then
-              gh release download "${{ inputs.release_tag }}" -p "*.apk" -O base.apk || true
-            fi
-            if [ ! -f "base.apk" ]; then
-              echo "::error title=Missing Base APK::Please provide a direct apk_url in the workflow inputs or attach base.apk."
+            echo "Attempting to download base.apk from release ${{ inputs.release_tag }}..."
+            gh release download "${{ inputs.release_tag }}" -p "base.apk" -O base.apk || \
+            curl -fL "https://github.com/${{ github.repository }}/releases/download/${{ inputs.release_tag }}/base.apk" -o base.apk || true
+            
+            if [ ! -f "base.apk" ] || [ ! -s "base.apk" ]; then
+              echo "::error title=Missing Base APK::Could not acquire base.apk."
               exit 1
             fi
           fi
@@ -111,12 +112,12 @@ jobs:
           path: "Pix-Material-You-${{ inputs.release_tag }}-Modded.apk"
           if-no-files-found: error
 
-      - name: Publish to GitHub Release
+      - name: Attach to GitHub Release
         if: ${{ inputs.create_release }}
-        uses: softprops/action-gh-release@v2
-        with:
-          files: "Pix-Material-You-${{ inputs.release_tag }}-Modded.apk"
-          name: "${{ inputs.release_tag }}"
-          tag_name: "${{ inputs.release_tag }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          APK_FILE="Pix-Material-You-${{ inputs.release_tag }}-Modded.apk"
+          echo "Uploading $APK_FILE to release ${{ inputs.release_tag }}..."
+          gh release upload "${{ inputs.release_tag }}" "$APK_FILE" --clobber || \
+          gh release create "${{ inputs.release_tag }}" "$APK_FILE" --title "${{ inputs.release_tag }}" --notes "Production signed modded APK"
