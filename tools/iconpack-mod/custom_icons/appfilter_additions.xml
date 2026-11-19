@@ -2,17 +2,49 @@
 <!-- Custom Additions for assets/appfilter.xml      -->
 <!-- ============================================== -->
 
-	<!-- Wallet -->
+	<!-- 1. Wallet (com.mrdarksidetm.wallet) -->
 	<item component="ComponentInfo{com.mrdarksidetm.wallet/com.mrdarksidetm.wallet.MainActivity}" drawable="wallet_dym" />
-	<!-- Jeevan Pramaan -->
+	<item component="ComponentInfo{com.mrdarksidetm.wallet/com.mrdarksidetm.wallet.ui.MainActivity}" drawable="wallet_dym" />
+	<item component="ComponentInfo{com.mrdarksidetm.wallet/com.mrdarksidetm.wallet.presentation.MainActivity}" drawable="wallet_dym" />
+	<item component="ComponentInfo{com.mrdarksidetm.wallet/com.mrdarksidetm.wallet.MainActivity}" drawable="wallet" />
+
+	<!-- 2. Jeevan Pramaan (com.aadhar.life & com.aadhaar.life) -->
 	<item component="ComponentInfo{com.aadhar.life/com.aadhar.life.MainActivity}" drawable="jeevan_pramaan_dym" />
-	<!-- Suvidha Bihar -->
+	<item component="ComponentInfo{com.aadhar.life/com.aadhar.life.SplashActivity}" drawable="jeevan_pramaan_dym" />
+	<item component="ComponentInfo{com.aadhar.life/com.aadhar.life.activity.SplashActivity}" drawable="jeevan_pramaan_dym" />
+	<item component="ComponentInfo{com.aadhar.life/com.aadhar.life.activity.MainActivity}" drawable="jeevan_pramaan_dym" />
+	<item component="ComponentInfo{com.aadhaar.life/com.aadhaar.life.MainActivity}" drawable="jeevan_pramaan_dym" />
+	<item component="ComponentInfo{com.aadhaar.life/com.aadhaar.life.SplashActivity}" drawable="jeevan_pramaan_dym" />
+	<item component="ComponentInfo{com.aadhaar.life/com.aadhaar.life.activity.SplashActivity}" drawable="jeevan_pramaan_dym" />
+	<item component="ComponentInfo{com.aadhaar.life/com.aadhaar.life.activity.MainActivity}" drawable="jeevan_pramaan_dym" />
+
+	<!-- 3. Suvidha Bihar (com.Suvidha_Bihar) -->
 	<item component="ComponentInfo{com.Suvidha_Bihar/com.Suvidha_Bihar.MainActivity}" drawable="suvidha_bihar_dym" />
-	<!-- PixelLab -->
+	<item component="ComponentInfo{com.Suvidha_Bihar/com.Suvidha_Bihar.SplashActivity}" drawable="suvidha_bihar_dym" />
+	<item component="ComponentInfo{com.Suvidha_Bihar/com.Suvidha_Bihar.SplashScreen}" drawable="suvidha_bihar_dym" />
+	<item component="ComponentInfo{com.Suvidha_Bihar/com.Suvidha_Bihar.activity.MainActivity}" drawable="suvidha_bihar_dym" />
+	<item component="ComponentInfo{com.Suvidha_Bihar/com.Suvidha_Bihar.activity.SplashActivity}" drawable="suvidha_bihar_dym" />
+	<item component="ComponentInfo{com.Suvidha_Bihar/com.Suvidha_Bihar.activity.SplashScreen}" drawable="suvidha_bihar_dym" />
+
+	<!-- 4. PixelLab (com.imaginstudio.imagetools.pixellab.morphe) -->
 	<item component="ComponentInfo{com.imaginstudio.imagetools.pixellab.morphe/com.imaginstudio.imagetools.pixellab.MainActivity}" drawable="pixellab_dym" />
-	<!-- Bihar Bijli Smart Meter -->
+	<item component="ComponentInfo{com.imaginstudio.imagetools.pixellab.morphe/com.imaginstudio.imagetools.pixellab.morphe.MainActivity}" drawable="pixellab_dym" />
+	<item component="ComponentInfo{com.imaginstudio.imagetools.pixellab.morphe/com.imaginstudio.imagetools.pixellab.morphe.SplashActivity}" drawable="pixellab_dym" />
+	<item component="ComponentInfo{com.imaginstudio.imagetools.pixellab.morphe/com.imaginstudio.imagetools.pixellab.MainActivity}" drawable="pixellab" />
+
+	<!-- 5. Bihar Bijli Smart Meter (com.dew.scm.eesl) -->
 	<item component="ComponentInfo{com.dew.scm.eesl/com.dew.scm.eesl.MainActivity}" drawable="bihar_bijli_dym" />
-	<!-- Zave -->
+	<item component="ComponentInfo{com.dew.scm.eesl/com.dew.scm.eesl.SplashActivity}" drawable="bihar_bijli_dym" />
+	<item component="ComponentInfo{com.dew.scm.eesl/com.dew.scm.eesl.SplashScreen}" drawable="bihar_bijli_dym" />
+	<item component="ComponentInfo{com.dew.scm.eesl/com.dew.scm.eesl.activity.MainActivity}" drawable="bihar_bijli_dym" />
+	<item component="ComponentInfo{com.dew.scm.eesl/com.dew.scm.eesl.activity.SplashActivity}" drawable="bihar_bijli_dym" />
+	<item component="ComponentInfo{com.dew.scm.eesl/com.dew.scm.eesl.activity.SplashScreen}" drawable="bihar_bijli_dym" />
+
+	<!-- 6. Zave (com.zave.penny) -->
 	<item component="ComponentInfo{com.zave.penny/com.zave.penny.MainActivity}" drawable="zave_dym" />
-	<!-- June -->
+	<item component="ComponentInfo{com.zave.penny/com.zave.penny.SplashActivity}" drawable="zave_dym" />
+	<item component="ComponentInfo{com.zave.penny/com.zave.penny.ui.MainActivity}" drawable="zave_dym" />
+	<item component="ComponentInfo{com.zave.penny/com.zave.penny.ui.activity.MainActivity}" drawable="zave_dym" />
+
+	<!-- 7. June (com.denser.june) -->
 	<item component="ComponentInfo{com.denser.june/com.denser.june.MainActivity}" drawable="june_dym" />

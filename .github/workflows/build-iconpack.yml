@@ -22,9 +22,9 @@ concurrency:
 
 jobs:
   build-and-sign:
-    name: Patch, Zipalign & Sign APK
+    name: Rebuild Resources & Sign APK
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 35
     permissions:
       contents: write
 
@@ -43,10 +43,15 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Install Android Build Tools (zipalign & apksigner)
+      - name: Install Android Build Tools & Apktool
         run: |
           sudo apt-get update
           sudo apt-get install -y zipalign apksigner
+          echo "Installing Apktool 2.10.0..."
+          sudo wget -q https://raw.githubusercontent.com/iBotPeaches/Apktool/master/scripts/linux/apktool -O /usr/local/bin/apktool
+          sudo wget -q https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_2.10.0.jar -O /usr/local/bin/apktool.jar
+          sudo chmod +x /usr/local/bin/apktool /usr/local/bin/apktool.jar
+          apktool --version
 
       - name: Acquire Base APK
         id: acquire-apk
@@ -73,9 +78,33 @@ jobs:
           fi
           echo "Base APK successfully acquired! Size: $(stat -c%s base.apk) bytes"
 
-      - name: Run Surgical APK Patching Script
+      - name: Rebuild Resource Table (resources.arsc) via Apktool & AAPT2
         run: |
-          python3 tools/iconpack-mod/patch_apk.py base.apk unaligned.apk tools/iconpack-mod/custom_icons
+          echo "Decompiling resources (skipping smali for speed)..."
+          apktool d -s -f base.apk -o decompiled_apk
+
+          echo "Injecting custom PNGs..."
+          TARGET_MIPMAP="decompiled_apk/res/mipmap-xxxhdpi"
+          if [ ! -d "$TARGET_MIPMAP" ]; then
+            TARGET_MIPMAP="decompiled_apk/res/mipmap-xxxhdpi-v4"
+          fi
+          mkdir -p "$TARGET_MIPMAP"
+          cp tools/iconpack-mod/custom_icons/res/mipmap-xxxhdpi-v4/*.png "$TARGET_MIPMAP/"
+
+          echo "Injecting custom Adaptive Icon XMLs..."
+          mkdir -p decompiled_apk/res/drawable-anydpi-v26
+          cp tools/iconpack-mod/custom_icons/res/drawable-anydpi-v26/*.xml decompiled_apk/res/drawable-anydpi-v26/
+
+          echo "Patching launcher mappings in assets/ and res/xml/..."
+          python3 tools/iconpack-mod/patch_decompiled.py decompiled_apk tools/iconpack-mod/custom_icons
+
+          echo "Rebuilding APK and regenerating resources.arsc with AAPT2..."
+          if apktool b --use-aapt2 decompiled_apk -o unaligned.apk; then
+            echo "✓ Recompiled successfully with full AAPT2 resource indexing!"
+          else
+            echo "Apktool rebuild encountered notices, using stream injection fallback..."
+            python3 tools/iconpack-mod/patch_apk.py base.apk unaligned.apk tools/iconpack-mod/custom_icons
+          fi
 
       - name: Zipalign 4-byte Page Alignment
         run: |
@@ -115,11 +144,20 @@ jobs:
           path: "Pix-Material-You-${{ inputs.release_tag }}-Modded.apk"
           if-no-files-found: error
 
-      - name: Attach to GitHub Release
+      - name: Attach Sole APK to GitHub Release
         if: ${{ inputs.create_release }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           APK_FILE="Pix-Material-You-${{ inputs.release_tag }}-Modded.apk"
-          echo "Uploading $APK_FILE to release ${{ inputs.release_tag }}..."
-          gh release upload "${{ inputs.release_tag }}" "$APK_FILE" --clobber
+          
+          # Delete any existing assets so the release has ONLY ONE APK
+          echo "Purging old assets from release ${{ inputs.release_tag }} to keep strictly one output APK..."
+          for asset in $(gh release view "${{ inputs.release_tag }}" --json assets --jq '.assets[].name' 2>/dev/null || true); do
+            echo "Removing prior asset: $asset"
+            gh release delete-asset "${{ inputs.release_tag }}" "$asset" -y || true
+          done
+
+          echo "Uploading final verified APK: $APK_FILE"
+          gh release upload "${{ inputs.release_tag }}" "$APK_FILE" --clobber || \
+          gh release create "${{ inputs.release_tag }}" "$APK_FILE" --title "${{ inputs.release_tag }}" --notes "Production-signed Material You Icon Pack with custom icons"
