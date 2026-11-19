@@ -98,13 +98,11 @@ jobs:
           echo "Patching launcher mappings in assets/ and res/xml/..."
           python3 tools/iconpack-mod/patch_decompiled.py decompiled_apk tools/iconpack-mod/custom_icons
 
+          echo "Sanitizing resources for AAPT2 linking..."
+          python3 tools/iconpack-mod/sanitize_for_aapt2.py decompiled_apk
+
           echo "Rebuilding APK and regenerating resources.arsc with AAPT2..."
-          if apktool b --use-aapt2 decompiled_apk -o unaligned.apk; then
-            echo "✓ Recompiled successfully with full AAPT2 resource indexing!"
-          else
-            echo "Apktool rebuild encountered notices, using stream injection fallback..."
-            python3 tools/iconpack-mod/patch_apk.py base.apk unaligned.apk tools/iconpack-mod/custom_icons
-          fi
+          apktool b --use-aapt2 decompiled_apk -o unaligned.apk
 
       - name: Zipalign 4-byte Page Alignment
         run: |
@@ -159,5 +157,4 @@ jobs:
           done
 
           echo "Uploading final verified APK: $APK_FILE"
-          gh release upload "${{ inputs.release_tag }}" "$APK_FILE" --clobber || \
-          gh release create "${{ inputs.release_tag }}" "$APK_FILE" --title "${{ inputs.release_tag }}" --notes "Production-signed Material You Icon Pack with custom icons"
+          gh release upload "${{ inputs.release_tag }}" "$APK_FILE" --clobber
