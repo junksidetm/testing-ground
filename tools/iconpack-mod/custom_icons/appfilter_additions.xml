@@ -1,0 +1,18 @@
+<!-- ============================================== -->
+<!-- Custom Additions for assets/appfilter.xml      -->
+<!-- ============================================== -->
+
+	<!-- Wallet -->
+	<item component="ComponentInfo{com.mrdarksidetm.wallet/com.mrdarksidetm.wallet.MainActivity}" drawable="wallet_dym" />
+	<!-- Jeevan Pramaan -->
+	<item component="ComponentInfo{com.aadhar.life/com.aadhar.life.MainActivity}" drawable="jeevan_pramaan_dym" />
+	<!-- Suvidha Bihar -->
+	<item component="ComponentInfo{com.Suvidha_Bihar/com.Suvidha_Bihar.MainActivity}" drawable="suvidha_bihar_dym" />
+	<!-- PixelLab -->
+	<item component="ComponentInfo{com.imaginstudio.imagetools.pixellab.morphe/com.imaginstudio.imagetools.pixellab.MainActivity}" drawable="pixellab_dym" />
+	<!-- Bihar Bijli Smart Meter -->
+	<item component="ComponentInfo{com.dew.scm.eesl/com.dew.scm.eesl.MainActivity}" drawable="bihar_bijli_dym" />
+	<!-- Zave -->
+	<item component="ComponentInfo{com.zave.penny/com.zave.penny.MainActivity}" drawable="zave_dym" />
+	<!-- June -->
+	<item component="ComponentInfo{com.denser.june/com.denser.june.MainActivity}" drawable="june_dym" />

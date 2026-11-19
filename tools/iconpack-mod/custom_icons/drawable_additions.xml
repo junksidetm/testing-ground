@@ -1,0 +1,12 @@
+<!-- ============================================== -->
+<!-- Custom Additions for assets/drawable.xml       -->
+<!-- ============================================== -->
+
+	<category title="Custom Added" />
+	<item drawable="wallet_dym" />
+	<item drawable="jeevan_pramaan_dym" />
+	<item drawable="suvidha_bihar_dym" />
+	<item drawable="pixellab_dym" />
+	<item drawable="bihar_bijli_dym" />
+	<item drawable="zave_dym" />
+	<item drawable="june_dym" />

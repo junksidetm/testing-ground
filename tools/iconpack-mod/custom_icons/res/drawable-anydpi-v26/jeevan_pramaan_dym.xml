@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:tint="?android:attr/colorSurface" />
+    <foreground>
+        <bitmap android:src="@mipmap/jeevan_pramaan_foreground" />
+    </foreground>
+    <monochrome android:tint="?android:attr/colorPrimary" />
+</adaptive-icon>

@@ -72,3 +72,28 @@
   - `HomeScreen`: M3 Expressive UI with 5-tier Surface Container hierarchy, tactile geometry, source image bento card, live progress feedback, and post-generation open/save sheet.
   - `MainActivity`: Single-activity entry point with incoming `ACTION_SEND` and `ACTION_SEND_MULTIPLE` intent ingestion.
   - CI/CD Pipelines: Added `.github/workflows/ci.yml` and `.github/workflows/release.yml` with semantic versioning tag alignment.
+
+
+---
+
+### [Feature & CI/CD Pipeline: Material You Icon Pack Modding & Cloud Signing Engine] - 2026-11-20 02:38:00 IST
+- **Status:** Completed (100%)
+- **Target Architecture:** Android Icon Pack (Adaptive Icons + Monochrome Themed Icons, API 26-35)
+- **Target Under Analysis:** `Pix Material You Light Dark v6.1.6 (Patched).apk` (`com.pashapuma.pix.material.you.dark`)
+- **Modding Analysis & Reverse Engineering Findings:**
+  - Deconstructed 55,953-entry archive and reverse-engineered CandyBar dashboard integration, adaptive icon binary XML structures, and Monet dynamic tinting filters (`PorterDuff.SRC_IN`).
+  - Identified multi-tone layered shading technique: 1-color black alpha masks (`#000000` with varying alpha levels) dynamically recolored by Android's GPU without hardcoded palette values.
+  - Resolved launcher mapping schema across `assets/appfilter.xml` and `assets/drawable.xml`.
+- **Custom Icon Assets Engineered:**
+  - Engineered 7 custom icons across SVG vector masters, 432x432 px transparent PNG foregrounds, and `<adaptive-icon>` XML definitions:
+    1. *Wallet*: `com.mrdarksidetm.wallet` -> `wallet_dym`
+    2. *Jeevan Pramaan*: `com.aadhar.life` -> `jeevan_pramaan_dym`
+    3. *Suvidha Bihar*: `com.Suvidha_Bihar` -> `suvidha_bihar_dym` (Sanitized white canvas background to pure alpha transparency while preserving 24% card opacity)
+    4. *PixelLab*: `com.imaginstudio.imagetools.pixellab.morphe` -> `pixellab_dym`
+    5. *Bihar Bijli Smart Meter*: `com.dew.scm.eesl` -> `bihar_bijli_dym` (Vectorized clean contour)
+    6. *Zave*: `com.zave.penny` -> `zave_dym`
+    7. *June*: `com.denser.june` -> `june_dym` (Extracted and scaled official monochrome vector from upstream repository `DenserMeerkat/June`)
+- **Components & CI/CD Implementation:**
+  - `tools/iconpack-mod/patch_apk.py`: In-memory archive stream patcher injecting PNGs, XMLs, and launcher bindings directly without decompressing 56,000 files, strictly respecting the 4 GB RAM host mandate.
+  - `tools/iconpack-mod/custom_icons/`: Complete asset hierarchy housing master SVGs, 432x432 xxxhdpi PNGs, adaptive XMLs, and XML patch snippets.
+  - `.github/workflows/build-iconpack.yml`: Production cloud build, 4-byte page zipalign (`zipalign -p -f -v 4`), and cryptographic multi-scheme signing pipeline (`apksigner` v1, v2, v3). Releases production-signed APK artifacts with zero local memory overhead.
