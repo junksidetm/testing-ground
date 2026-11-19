@@ -59,16 +59,19 @@ jobs:
           elif [ -f "base.apk" ]; then
             echo "Using base.apk from repository root."
           else
-            echo "Attempting to download base.apk from release ${{ inputs.release_tag }}..."
-            gh release download "${{ inputs.release_tag }}" -p "base.apk" -O base.apk || \
-            curl -fL "https://github.com/${{ github.repository }}/releases/download/${{ inputs.release_tag }}/base.apk" -o base.apk || true
+            echo "Downloading APK asset from release ${{ inputs.release_tag }}..."
+            gh release download "${{ inputs.release_tag }}" --pattern "*.apk" --dir base_download/
+            FOUND_APK=$(find base_download/ -type f -name "*.apk" | head -n 1)
+            if [ -n "$FOUND_APK" ]; then
+              mv "$FOUND_APK" base.apk
+            fi
             
             if [ ! -f "base.apk" ] || [ ! -s "base.apk" ]; then
               echo "::error title=Missing Base APK::Could not acquire base.apk."
               exit 1
             fi
           fi
-          echo "Base APK size: $(stat -c%s base.apk) bytes"
+          echo "Base APK successfully acquired! Size: $(stat -c%s base.apk) bytes"
 
       - name: Run Surgical APK Patching Script
         run: |
@@ -119,5 +122,4 @@ jobs:
         run: |
           APK_FILE="Pix-Material-You-${{ inputs.release_tag }}-Modded.apk"
           echo "Uploading $APK_FILE to release ${{ inputs.release_tag }}..."
-          gh release upload "${{ inputs.release_tag }}" "$APK_FILE" --clobber || \
-          gh release create "${{ inputs.release_tag }}" "$APK_FILE" --title "${{ inputs.release_tag }}" --notes "Production signed modded APK"
+          gh release upload "${{ inputs.release_tag }}" "$APK_FILE" --clobber
