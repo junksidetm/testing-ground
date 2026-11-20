@@ -97,3 +97,18 @@
   - `tools/iconpack-mod/patch_apk.py`: In-memory archive stream patcher injecting PNGs, XMLs, and launcher bindings directly without decompressing 56,000 files, strictly respecting the 4 GB RAM host mandate.
   - `tools/iconpack-mod/custom_icons/`: Complete asset hierarchy housing master SVGs, 432x432 xxxhdpi PNGs, adaptive XMLs, and XML patch snippets.
   - `.github/workflows/build-iconpack.yml`: Production cloud build, 4-byte page zipalign (`zipalign -p -f -v 4`), and cryptographic multi-scheme signing pipeline (`apksigner` v1, v2, v3). Releases production-signed APK artifacts with zero local memory overhead.
+
+
+---
+
+### [Release: Material You Icon Pack v6.1.7] - 2026-11-20 09:44:00 IST
+- **Status:** Release Prepared (100%)
+- **Release Tag:** `v6.1.7`
+- **Release Title:** `v6.1.7`
+- **Architecture:** Android Icon Pack (Adaptive Icons + Monochrome Themed Icons)
+- **Deliverables:**
+  - `Pix-Material-You-v6.1.7-Modded.apk`: Single production-signed APK asset containing 7 verified custom icons with complete AAPT2 `resources.arsc` indexing.
+  - Base APK inheritance: Integrated baseline pulling from `v6.1.6` with automated release promotion.
+- **Workflow Improvements:**
+  - Automated version bumping (`versionName: 6.1.7`, `versionCode: 77`) in `apktool.yml` to support in-place Android OS updates.
+  - Enforced single-asset release policy: Purges any intermediate artifacts so users only ever see the final APK.
