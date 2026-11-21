@@ -137,3 +137,11 @@
   - `.github/workflows/build-longshot-pdf.yml`: Production APK builder, keystore generation, zipalign, and multi-scheme signing pipeline for Long Shot PDF (`LongShot-PDF-<tag>.apk`).
   - `.github/workflows/build-all-apps.yml`: Universal multi-app orchestrator facilitating concurrent builds and release attachments.
   - `.github/workflows/build-iconpack.yml`: Refactored release publishing step to eliminate destructive asset purging, ensuring multi-app artifact coexistence.
+
+
+---
+
+### [CI/CD Fix: Gradle Wrapper Bootstrap in Long Shot PDF Builder] - 2026-11-21 15:32:00 IST
+- **Status:** Completed (100%)
+- **Problem Diagnosed:** Remote GitHub Actions builder failed (`ClassNotFoundException: :app:assembleRelease`) due to missing `gradle/wrapper/gradle-wrapper.jar` binary in repository.
+- **Remediation:** Injected explicit `gradle wrapper --gradle-version 8.10.2` bootstrap generation step across `build-longshot-pdf.yml` and `verify-longshot-pdf.yml`, ensuring deterministic wrapper binaries prior to invoking `./gradlew`.
