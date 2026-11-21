@@ -1,4 +1,4 @@
-package com.testingground.longshotpdf
+package com.mrdarksidetm.longshotpdf
 
 import android.content.Intent
 import android.net.Uri
@@ -8,9 +8,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import com.testingground.longshotpdf.ui.screens.HomeScreen
-import com.testingground.longshotpdf.ui.theme.LongShotPdfTheme
-import com.testingground.longshotpdf.ui.viewmodel.PdfViewModel
+import com.mrdarksidetm.longshotpdf.ui.screens.HomeScreen
+import com.mrdarksidetm.longshotpdf.ui.theme.LongShotPdfTheme
+import com.mrdarksidetm.longshotpdf.ui.viewmodel.PdfViewModel
 
 class MainActivity : ComponentActivity() {
 

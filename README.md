@@ -11,7 +11,7 @@ A multi-application innovation and reverse-engineering hub for Android, featurin
 
 | Application | Architecture / Stack | Current Version | Release Tag | Direct APK Download | CI / Build Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Long Shot PDF Engine** | Kotlin + Jetpack Compose + M3 Expressive | `v1.0.2` | [`v1.0.2`](https://github.com/junksidetm/testing-ground/releases/tag/v1.0.2) | [📥 Download LongShot-PDF APK](https://github.com/junksidetm/testing-ground/releases/download/v1.0.2/LongShot-PDF-v1.0.2.apk) | [![Long Shot CI](https://github.com/junksidetm/testing-ground/actions/workflows/verify-longshot-pdf.yml/badge.svg)](https://github.com/junksidetm/testing-ground/actions/workflows/verify-longshot-pdf.yml) |
+| **LongShotPDF** | Kotlin + Jetpack Compose + M3 Expressive | `v1.0.3` | [`v1.0.3`](https://github.com/junksidetm/testing-ground/releases/tag/v1.0.3) | [📥 Download LongShot-PDF APK](https://github.com/junksidetm/testing-ground/releases/download/v1.0.3/LongShot-PDF-v1.0.3.apk) | [![Long Shot CI](https://github.com/junksidetm/testing-ground/actions/workflows/verify-longshot-pdf.yml/badge.svg)](https://github.com/junksidetm/testing-ground/actions/workflows/verify-longshot-pdf.yml) |
 | **Pix Material You Icon Pack** | Android Adaptive & Themed Icons + AAPT2 | `v6.1.7` | [`v6.1.7`](https://github.com/junksidetm/testing-ground/releases/tag/v6.1.7) | [📥 Download Pix Material You APK](https://github.com/junksidetm/testing-ground/releases/download/v6.1.7/Pix-Material-You-v6.1.7-Modded.apk) | [![Icon Pack Builder](https://github.com/junksidetm/testing-ground/actions/workflows/build-iconpack.yml/badge.svg)](https://github.com/junksidetm/testing-ground/actions/workflows/build-iconpack.yml) |
 
 ---
@@ -29,10 +29,10 @@ This repository operates as an **independent multi-application monorepo**:
 
 ## 🛠️ Hosted Applications
 
-### 1. Long Shot PDF Engine (`app/`)
-* **Path:** [`app/src/main/java/com/testingground/longshotpdf`](file:///D:/code/testing-ground/app/src/main/java/com/testingground/longshotpdf)
+### 1. LongShotPDF (`app/`)
+* **Path:** [`app/src/main/kotlin/com/mrdarksidetm/longshotpdf`](file:///D:/code/testing-ground/app/src/main/kotlin/com/mrdarksidetm/longshotpdf)
 * **Status:** Stable (100%)
-* **Package:** `com.testingground.longshotpdf`
+* **Package / App ID:** `com.mrdarksidetm.longshotpdf`
 * **Features:**
   * **Seamless Single-Page Canvas:** Ingests ultra-tall panoramic screenshots and renders a continuous dynamic-height PDF with **zero page cuts or seams**.
   * **Paginated A4 Canvas Mode:** Optional page slicing engine for clean physical print jobs.

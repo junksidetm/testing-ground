@@ -1,4 +1,4 @@
-package com.testingground.longshotpdf.ui.screens
+package com.mrdarksidetm.longshotpdf.ui.screens
 
 import android.content.Context
 import android.content.Intent
@@ -72,13 +72,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.testingground.longshotpdf.domain.ImageMetadata
-import com.testingground.longshotpdf.domain.PdfMode
-import com.testingground.longshotpdf.domain.QualityPreset
-import com.testingground.longshotpdf.ui.theme.PillShape
-import com.testingground.longshotpdf.ui.theme.Shapes
-import com.testingground.longshotpdf.ui.viewmodel.PdfUiState
-import com.testingground.longshotpdf.ui.viewmodel.PdfViewModel
+import com.mrdarksidetm.longshotpdf.domain.ImageMetadata
+import com.mrdarksidetm.longshotpdf.domain.PdfMode
+import com.mrdarksidetm.longshotpdf.domain.QualityPreset
+import com.mrdarksidetm.longshotpdf.ui.theme.PillShape
+import com.mrdarksidetm.longshotpdf.ui.theme.Shapes
+import com.mrdarksidetm.longshotpdf.ui.viewmodel.PdfUiState
+import com.mrdarksidetm.longshotpdf.ui.viewmodel.PdfViewModel
 import java.io.InputStream
 import java.io.OutputStream
 
@@ -699,7 +699,7 @@ fun ConversionProgressCard(progress: Float) {
 
 @Composable
 fun SuccessResultCard(
-    result: com.testingground.longshotpdf.domain.ConversionResult,
+    result: com.mrdarksidetm.longshotpdf.domain.ConversionResult,
     onOpenPdf: () -> Unit,
     onSaveAs: () -> Unit,
     onDismiss: () -> Unit

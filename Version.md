@@ -187,3 +187,16 @@
     - `app/src/main/res/drawable/ic_launcher_foreground.xml`: Rendered phone silhouette, thumbnail cards, typography paths, and white framing brackets matching the master artwork.
   - Bumped version to `v1.0.2` (`versionCode: 3`).
   - Updated `README.md` catalog to point to `v1.0.2`.
+
+
+---
+
+### [Rebranding & Application ID Update: LongShotPDF] - 2026-11-21 16:44:00 IST
+- **Status:** Completed (100%)
+- **Target App:** LongShotPDF (`v1.0.3`, `versionCode: 4`)
+- **Deliverables:**
+  - Updated application name string to `LongShotPDF` in `app/src/main/res/values/strings.xml`.
+  - Updated Android `applicationId` and `namespace` to `com.mrdarksidetm.longshotpdf` in `app/build.gradle.kts`.
+  - Refactored Kotlin package directory structure to `app/src/main/kotlin/com/mrdarksidetm/longshotpdf` across domain, UI, theme, and viewmodel layers.
+  - Bumped version to `v1.0.3` (`versionCode: 4`).
+  - Updated `README.md` catalog to reflect `LongShotPDF` (`com.mrdarksidetm.longshotpdf`, `v1.0.3`).

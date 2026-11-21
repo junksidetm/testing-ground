@@ -1,4 +1,4 @@
-package com.testingground.longshotpdf.domain
+package com.mrdarksidetm.longshotpdf.domain
 
 import android.content.Context
 import android.graphics.Bitmap

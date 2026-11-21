@@ -1,4 +1,4 @@
-package com.testingground.longshotpdf.ui.theme
+package com.mrdarksidetm.longshotpdf.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme

@@ -1,14 +1,14 @@
-package com.testingground.longshotpdf.ui.viewmodel
+package com.mrdarksidetm.longshotpdf.ui.viewmodel
 
 import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.testingground.longshotpdf.domain.ConversionResult
-import com.testingground.longshotpdf.domain.ImageMetadata
-import com.testingground.longshotpdf.domain.PdfConverterEngine
-import com.testingground.longshotpdf.domain.PdfMode
-import com.testingground.longshotpdf.domain.QualityPreset
+import com.mrdarksidetm.longshotpdf.domain.ConversionResult
+import com.mrdarksidetm.longshotpdf.domain.ImageMetadata
+import com.mrdarksidetm.longshotpdf.domain.PdfConverterEngine
+import com.mrdarksidetm.longshotpdf.domain.PdfMode
+import com.mrdarksidetm.longshotpdf.domain.QualityPreset
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
