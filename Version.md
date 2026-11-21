@@ -173,3 +173,17 @@
   - Injected `<files-path name="internal_files" path="." />` and `<root-path name="root" path="." />` in `app/src/main/res/xml/file_paths.xml`, providing universal root coverage for internal app storage, external storage, and vendor symlink mounts.
   - Bumped version to `v1.0.1` (`versionCode: 2`).
   - Updated `README.md` Direct Download link to point to `v1.0.1`.
+
+
+---
+
+### [Asset & Icon Integration: Custom Adaptive Icon Master] - 2026-11-21 16:36:00 IST
+- **Status:** Completed (100%)
+- **Target App:** Long Shot PDF Engine (`v1.0.2`, `versionCode: 3`)
+- **Deliverables:**
+  - Integrated official master SVG asset at `app/ic_launcher.svg`, engineered with strict 66px inner safe area constraints.
+  - Deconstructed into Android Adaptive Icon VectorDrawables:
+    - `app/src/main/res/drawable/ic_launcher_background.xml`: Precision linear gradient from cyan-blue `#2A9BF5` to deep cobalt `#005A9E`.
+    - `app/src/main/res/drawable/ic_launcher_foreground.xml`: Rendered phone silhouette, thumbnail cards, typography paths, and white framing brackets matching the master artwork.
+  - Bumped version to `v1.0.2` (`versionCode: 3`).
+  - Updated `README.md` catalog to point to `v1.0.2`.
