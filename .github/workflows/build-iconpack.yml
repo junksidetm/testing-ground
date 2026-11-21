@@ -15,6 +15,19 @@ on:
         description: 'Semantic version tag (must strictly match v<Version>)'
         required: false
         default: 'v6.1.7'
+  workflow_call:
+    inputs:
+      apk_url:
+        required: false
+        type: string
+        default: ''
+      create_release:
+        required: false
+        type: boolean
+        default: true
+      release_tag:
+        required: true
+        type: string
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -153,21 +166,16 @@ jobs:
           path: "Pix-Material-You-${{ inputs.release_tag }}-Modded.apk"
           if-no-files-found: error
 
-      - name: Publish Sole APK to GitHub Release
+      - name: Publish APK to GitHub Release
         if: ${{ inputs.create_release }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           APK_FILE="Pix-Material-You-${{ inputs.release_tag }}-Modded.apk"
           
-          # Check if release exists, if so purge other assets to ensure strictly one APK
+          # Upload with clobber to preserve other applications' release APK assets
           if gh release view "${{ inputs.release_tag }}" &>/dev/null; then
-            for asset in $(gh release view "${{ inputs.release_tag }}" --json assets --jq '.assets[].name' 2>/dev/null || true); do
-              if [ "$asset" != "$APK_FILE" ]; then
-                echo "Removing non-target asset: $asset"
-                gh release delete-asset "${{ inputs.release_tag }}" "$asset" -y || true
-              fi
-            done
+            echo "Uploading $APK_FILE to existing release ${{ inputs.release_tag }}..."
             gh release upload "${{ inputs.release_tag }}" "$APK_FILE" --clobber
           else
             echo "Creating new release ${{ inputs.release_tag }}..."

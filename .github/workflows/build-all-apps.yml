@@ -1,0 +1,63 @@
+name: Universal Multi-App Release Builder
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Target Semantic Version Tag (must match v<Version> e.g. v2.0.0)'
+        required: true
+        default: 'v1.0.0'
+      build_longshot:
+        description: 'Build Long Shot PDF Engine'
+        type: boolean
+        default: true
+      build_iconpack:
+        description: 'Build Pix Material You Icon Pack'
+        type: boolean
+        default: true
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  orchestrate-release:
+    name: Prepare Universal Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Ensure Release Tag Exists
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ inputs.release_tag }}"
+          if ! gh release view "$TAG" &>/dev/null; then
+            echo "Initializing release $TAG..."
+            gh release create "$TAG" --title "$TAG" --notes "Universal release bundle for Testing Ground apps."
+          else
+            echo "Release $TAG already exists."
+          fi
+
+  build-longshot:
+    name: Build Long Shot PDF
+    needs: orchestrate-release
+    if: ${{ inputs.build_longshot }}
+    uses: ./.github/workflows/build-longshot-pdf.yml
+    with:
+      release_tag: ${{ inputs.release_tag }}
+      publish_release: true
+    secrets: inherit
+
+  build-iconpack:
+    name: Build Icon Pack
+    needs: orchestrate-release
+    if: ${{ inputs.build_iconpack }}
+    uses: ./.github/workflows/build-iconpack.yml
+    with:
+      release_tag: ${{ inputs.release_tag }}
+      create_release: true
+    secrets: inherit

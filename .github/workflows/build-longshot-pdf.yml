@@ -1,0 +1,132 @@
+name: Long Shot PDF - Build & Release APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Semantic version tag to attach APK to (must match v<Version> e.g. v1.0.0)'
+        required: false
+        default: 'v1.0.0'
+      publish_release:
+        description: 'Publish/Attach to GitHub Release'
+        type: boolean
+        default: true
+  workflow_call:
+    inputs:
+      release_tag:
+        required: true
+        type: string
+      publish_release:
+        required: false
+        type: boolean
+        default: true
+  release:
+    types: [published]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-sign:
+    name: Build & Sign Long Shot PDF APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Set up Gradle 8.10.2
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.10.2'
+
+      - name: Install Android Build Tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y zipalign apksigner
+
+      - name: Grant Execute Permission for Gradlew
+        run: chmod +x gradlew
+
+      - name: Build Release APK via Gradle
+        run: ./gradlew :app:assembleRelease --no-daemon --stacktrace
+
+      - name: Locate Built APK
+        id: locate-apk
+        run: |
+          BUILT_APK=$(find app/build/outputs/apk/release -name "*.apk" | head -n 1)
+          if [ -z "$BUILT_APK" ] || [ ! -f "$BUILT_APK" ]; then
+            echo "::error title=APK Not Found::Release APK build did not produce an output file."
+            exit 1
+          fi
+          echo "FOUND_APK=$BUILT_APK" >> $GITHUB_OUTPUT
+          echo "Found built APK: $BUILT_APK"
+
+      - name: Zipalign 4-byte Page Alignment
+        run: |
+          zipalign -p -f -v 4 "${{ steps.locate-apk.outputs.FOUND_APK }}" aligned.apk
+
+      - name: Generate Release Keystore
+        run: |
+          keytool -genkey -v -keystore release.jks \
+            -alias longshot_key \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -storepass android \
+            -keypass android \
+            -dname "CN=LongShotPDF, OU=TestingGround, O=Junkside, L=World, ST=Global, C=US"
+
+      - name: Sign APK (v1, v2, and v3 schemes)
+        id: sign-apk
+        run: |
+          TARGET_TAG="${{ github.event.release.tag_name || inputs.release_tag || 'v1.0.0' }}"
+          FINAL_APK_NAME="LongShot-PDF-${TARGET_TAG}.apk"
+          apksigner sign --ks release.jks \
+            --ks-key-alias longshot_key \
+            --ks-pass pass:android \
+            --key-pass pass:android \
+            --v1-signing-enabled true \
+            --v2-signing-enabled true \
+            --v3-signing-enabled true \
+            --out "$FINAL_APK_NAME" \
+            aligned.apk
+          
+          apksigner verify --verbose --print-certs "$FINAL_APK_NAME"
+          echo "FINAL_APK=$FINAL_APK_NAME" >> $GITHUB_OUTPUT
+          echo "TARGET_TAG=$TARGET_TAG" >> $GITHUB_OUTPUT
+
+      - name: Upload Workflow Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.sign-apk.outputs.FINAL_APK }}
+          path: ${{ steps.sign-apk.outputs.FINAL_APK }}
+          if-no-files-found: error
+
+      - name: Publish APK to GitHub Release
+        if: ${{ github.event_name == 'release' || inputs.publish_release }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          APK_FILE="${{ steps.sign-apk.outputs.FINAL_APK }}"
+          TAG="${{ steps.sign-apk.outputs.TARGET_TAG }}"
+          
+          if gh release view "$TAG" &>/dev/null; then
+            echo "Uploading $APK_FILE to existing release $TAG..."
+            gh release upload "$TAG" "$APK_FILE" --clobber
+          else
+            echo "Creating new release $TAG..."
+            gh release create "$TAG" "$APK_FILE" --title "$TAG" --notes "Release containing production-signed Long Shot PDF engine."
+          fi
