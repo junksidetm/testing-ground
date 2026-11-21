@@ -161,3 +161,15 @@
 - **Status:** Completed (100%)
 - **Problem Diagnosed:** `:app:processReleaseResources` failed AAPT2 resource linking due to missing `drawable/ic_launcher_background` and `drawable/ic_launcher_foreground` referenced by `mipmap-anydpi-v26/ic_launcher.xml` and `ic_launcher_round.xml`.
 - **Remediation:** Added modern Material 3 vector assets in `app/src/main/res/drawable/` providing clean dark-themed adaptive background and cyan/purple document foreground contours.
+
+
+---
+
+### [Bug Fix: FileProvider Configured Root for Generated PDFs] - 2026-11-21 16:02:00 IST
+- **Status:** Completed (100%)
+- **Target App:** Long Shot PDF Engine (`v1.0.1`, `versionCode: 2`)
+- **Problem Diagnosed:** Runtime conversion crash with `IllegalArgumentException: Failed to find configured root that contains /data/user/0/com.testingground.longshotpdf/files/documents/...` when generating single-page seamless PDFs. `res/xml/file_paths.xml` omitted `<files-path>` for internal files storage.
+- **Remediation:**
+  - Injected `<files-path name="internal_files" path="." />` and `<root-path name="root" path="." />` in `app/src/main/res/xml/file_paths.xml`, providing universal root coverage for internal app storage, external storage, and vendor symlink mounts.
+  - Bumped version to `v1.0.1` (`versionCode: 2`).
+  - Updated `README.md` Direct Download link to point to `v1.0.1`.

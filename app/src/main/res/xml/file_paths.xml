@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<paths>
-    <external-files-path name="my_pdf_docs" path="documents/" />
-    <cache-path name="my_cache_docs" path="documents/" />
-    <external-cache-path name="my_ext_cache" path="documents/" />
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <files-path name="internal_files" path="." />
+    <cache-path name="internal_cache" path="." />
+    <external-files-path name="external_files" path="." />
+    <external-cache-path name="external_cache" path="." />
+    <external-path name="external_storage" path="." />
+    <root-path name="root" path="." />
 </paths>

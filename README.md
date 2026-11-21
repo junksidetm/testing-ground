@@ -11,7 +11,7 @@ A multi-application innovation and reverse-engineering hub for Android, featurin
 
 | Application | Architecture / Stack | Current Version | Release Tag | Direct APK Download | CI / Build Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Long Shot PDF Engine** | Kotlin + Jetpack Compose + M3 Expressive | `v1.0.0` | [`v1.0.0`](https://github.com/junksidetm/testing-ground/releases/tag/v1.0.0) | [📥 Download LongShot-PDF APK](https://github.com/junksidetm/testing-ground/releases/download/v1.0.0/LongShot-PDF-v1.0.0.apk) | [![Long Shot CI](https://github.com/junksidetm/testing-ground/actions/workflows/verify-longshot-pdf.yml/badge.svg)](https://github.com/junksidetm/testing-ground/actions/workflows/verify-longshot-pdf.yml) |
+| **Long Shot PDF Engine** | Kotlin + Jetpack Compose + M3 Expressive | `v1.0.1` | [`v1.0.1`](https://github.com/junksidetm/testing-ground/releases/tag/v1.0.1) | [📥 Download LongShot-PDF APK](https://github.com/junksidetm/testing-ground/releases/download/v1.0.1/LongShot-PDF-v1.0.1.apk) | [![Long Shot CI](https://github.com/junksidetm/testing-ground/actions/workflows/verify-longshot-pdf.yml/badge.svg)](https://github.com/junksidetm/testing-ground/actions/workflows/verify-longshot-pdf.yml) |
 | **Pix Material You Icon Pack** | Android Adaptive & Themed Icons + AAPT2 | `v6.1.7` | [`v6.1.7`](https://github.com/junksidetm/testing-ground/releases/tag/v6.1.7) | [📥 Download Pix Material You APK](https://github.com/junksidetm/testing-ground/releases/download/v6.1.7/Pix-Material-You-v6.1.7-Modded.apk) | [![Icon Pack Builder](https://github.com/junksidetm/testing-ground/actions/workflows/build-iconpack.yml/badge.svg)](https://github.com/junksidetm/testing-ground/actions/workflows/build-iconpack.yml) |
 
 ---
