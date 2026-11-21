@@ -215,3 +215,21 @@
     - Inverted middle-left card to full `#758AEF` with white content lines for striking tactile contrast.
   - Bumped version to `v1.0.4` (`versionCode: 5`).
   - Updated `README.md` catalog to point to `v1.0.4`.
+
+
+---
+
+### [Feature Implementation: Universal Material 3 Expressive About Page] - 2026-11-21 17:35:00 IST
+- **Status:** Completed (100%)
+- **Target App:** LongShotPDF (`v1.0.5`, `versionCode: 6`)
+- **Deliverables:**
+  - Implemented the official Universal About Page (`app/src/main/kotlin/com/mrdarksidetm/longshotpdf/ui/screens/AboutScreen.kt`) matching the M3 Expressive architecture standard:
+    - **Hero Visualizer:** 44dp squircle container (`RoundedCornerShape(44.dp)`) with outline border, app logo (`app_logo.xml`) filling exactly 75% of space, animated M3 Expressive "Bun" shape (top-left, ~14s reverse rotation), and animated M3 Expressive "9-Side Cookie" shape (bottom-right, ~32s rotation and scale).
+    - **App Title & Dynamic Version Pill:** Displays `LongShotPDF` with version badge reading `BuildConfig.VERSION_NAME` and interactive 7-tap Easter egg triggering Developer Mode feedback.
+    - **Developer Profile Card:** Features avatar (`developer.png`), name ("Abhijeet Yadav"), title ("Developer"), and tactile pill buttons for GitHub repository and Email.
+    - **Community FOSS Connected Settings Group ("The Other's Way" from Pulse Studio):** 28dp rounded container, 2dp separation, position-aware adaptive corners, spring touch morphing, leading icons, and trailing chevron indicators for Update Check, GitHub Repository, M3 Guidelines, and In-App License Sheet.
+    - **In-App License Modal Bottom Sheet:** Embedded Apache License 2.0 full text viewer.
+    - **Footer:** Minimalist "Made with ❤️" attribution.
+  - Connected navigation in `MainActivity.kt` and added About action icon to `HomeScreen.kt` TopAppBar with back-handler navigation support.
+  - Bumped version to `v1.0.5` (`versionCode: 6`).
+  - Updated `README.md` catalog to point to `v1.0.5`.
