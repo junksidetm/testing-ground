@@ -145,3 +145,11 @@
 - **Status:** Completed (100%)
 - **Problem Diagnosed:** Remote GitHub Actions builder failed (`ClassNotFoundException: :app:assembleRelease`) due to missing `gradle/wrapper/gradle-wrapper.jar` binary in repository.
 - **Remediation:** Injected explicit `gradle wrapper --gradle-version 8.10.2` bootstrap generation step across `build-longshot-pdf.yml` and `verify-longshot-pdf.yml`, ensuring deterministic wrapper binaries prior to invoking `./gradlew`.
+
+
+---
+
+### [CI/CD Fix: Release Signing Fallback Decoupling] - 2026-11-21 15:36:00 IST
+- **Status:** Completed (100%)
+- **Problem Diagnosed:** `:app:validateSigningRelease` failed on remote runner due to `initWith(getByName("debug"))` referencing missing `debug.keystore`.
+- **Remediation:** Surgically decoupled signing config validation in `app/build.gradle.kts`. When no explicit keystore file is provided to Gradle, release compilation outputs an unsigned APK, allowing downstream `apksigner` in GitHub Actions to handle page alignment and v1/v2/v3 signing cleanly.

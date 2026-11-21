@@ -35,8 +35,6 @@ android {
                 this.keyPassword = keyPassword
                 enableV1Signing = true
                 enableV2Signing = true
-            } else {
-                initWith(getByName("debug"))
             }
         }
     }
@@ -44,7 +42,10 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            signingConfig = signingConfigs.getByName("release")
+            val relConfig = signingConfigs.getByName("release")
+            if (relConfig.storeFile != null) {
+                signingConfig = relConfig
+            }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
