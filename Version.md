@@ -200,3 +200,18 @@
   - Refactored Kotlin package directory structure to `app/src/main/kotlin/com/mrdarksidetm/longshotpdf` across domain, UI, theme, and viewmodel layers.
   - Bumped version to `v1.0.3` (`versionCode: 4`).
   - Updated `README.md` catalog to reflect `LongShotPDF` (`com.mrdarksidetm.longshotpdf`, `v1.0.3`).
+
+
+---
+
+### [Asset & Icon Refinement: Improved Visual Hierarchy & Contrast] - 2026-11-21 17:08:00 IST
+- **Status:** Completed (100%)
+- **Target App:** LongShotPDF (`v1.0.4`, `versionCode: 5`)
+- **Deliverables:**
+  - Integrated improved master SVG icon at `app/ic_launcher.svg`.
+  - Refined Android Adaptive Icon foreground (`app/src/main/res/drawable/ic_launcher_foreground.xml`):
+    - Removed illegible micro-typography in favor of a bolder visual hierarchy.
+    - Enhanced top image card with vibrant `#758AEF` fill and crisp white icon accents.
+    - Inverted middle-left card to full `#758AEF` with white content lines for striking tactile contrast.
+  - Bumped version to `v1.0.4` (`versionCode: 5`).
+  - Updated `README.md` catalog to point to `v1.0.4`.
