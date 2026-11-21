@@ -153,3 +153,11 @@
 - **Status:** Completed (100%)
 - **Problem Diagnosed:** `:app:validateSigningRelease` failed on remote runner due to `initWith(getByName("debug"))` referencing missing `debug.keystore`.
 - **Remediation:** Surgically decoupled signing config validation in `app/build.gradle.kts`. When no explicit keystore file is provided to Gradle, release compilation outputs an unsigned APK, allowing downstream `apksigner` in GitHub Actions to handle page alignment and v1/v2/v3 signing cleanly.
+
+
+---
+
+### [Resource Fix: Adaptive Icon Vector Assets] - 2026-11-21 15:42:00 IST
+- **Status:** Completed (100%)
+- **Problem Diagnosed:** `:app:processReleaseResources` failed AAPT2 resource linking due to missing `drawable/ic_launcher_background` and `drawable/ic_launcher_foreground` referenced by `mipmap-anydpi-v26/ic_launcher.xml` and `ic_launcher_round.xml`.
+- **Remediation:** Added modern Material 3 vector assets in `app/src/main/res/drawable/` providing clean dark-themed adaptive background and cyan/purple document foreground contours.
