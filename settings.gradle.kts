@@ -21,3 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "testing-ground"
 include(":app")
+project(":app").projectDir = file("LongShotPDF/app")

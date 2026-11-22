@@ -113,17 +113,17 @@ jobs:
             TARGET_MIPMAP="decompiled_apk/res/mipmap-xxxhdpi-v4"
           fi
           mkdir -p "$TARGET_MIPMAP"
-          cp tools/iconpack-mod/custom_icons/res/mipmap-xxxhdpi-v4/*.png "$TARGET_MIPMAP/"
+          cp "Pix Material You Icon Pack Mod/custom_icons/res/mipmap-xxxhdpi-v4"/*.png "$TARGET_MIPMAP/"
 
           echo "Injecting custom Adaptive Icon XMLs..."
           mkdir -p decompiled_apk/res/drawable-anydpi-v26
-          cp tools/iconpack-mod/custom_icons/res/drawable-anydpi-v26/*.xml decompiled_apk/res/drawable-anydpi-v26/
+          cp "Pix Material You Icon Pack Mod/custom_icons/res/drawable-anydpi-v26"/*.xml decompiled_apk/res/drawable-anydpi-v26/
 
           echo "Patching launcher mappings in assets/ and res/xml/..."
-          python3 tools/iconpack-mod/patch_decompiled.py decompiled_apk tools/iconpack-mod/custom_icons
+          python3 "Pix Material You Icon Pack Mod/patch_decompiled.py" decompiled_apk "Pix Material You Icon Pack Mod/custom_icons"
 
           echo "Sanitizing resources for AAPT2 linking..."
-          python3 tools/iconpack-mod/sanitize_for_aapt2.py decompiled_apk
+          python3 "Pix Material You Icon Pack Mod/sanitize_for_aapt2.py" decompiled_apk
 
           echo "Rebuilding APK and regenerating resources.arsc with AAPT2..."
           apktool b --use-aapt2 decompiled_apk -o unaligned.apk

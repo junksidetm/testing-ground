@@ -3,6 +3,7 @@ name: Long Shot PDF - CI & Verification
 on:
   push:
     paths:
+      - 'LongShotPDF/**'
       - 'app/**'
       - 'gradle/**'
       - 'build.gradle.kts'
@@ -11,6 +12,7 @@ on:
     branches: [ "main", "master" ]
   pull_request:
     paths:
+      - 'LongShotPDF/**'
       - 'app/**'
       - 'gradle/**'
       - 'build.gradle.kts'

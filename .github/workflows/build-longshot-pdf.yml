@@ -69,7 +69,7 @@ jobs:
       - name: Locate Built APK
         id: locate-apk
         run: |
-          BUILT_APK=$(find app/build/outputs/apk/release -name "*.apk" | head -n 1)
+          BUILT_APK=$(find LongShotPDF/app/build/outputs/apk/release app/build/outputs/apk/release -name "*.apk" 2>/dev/null | head -n 1)
           if [ -z "$BUILT_APK" ] || [ ! -f "$BUILT_APK" ]; then
             echo "::error title=APK Not Found::Release APK build did not produce an output file."
             exit 1

@@ -51,7 +51,7 @@ jobs:
       - name: Locate Output APK
         id: locate-apk
         run: |
-          APK_PATH=$(find app/build/outputs/apk/release -name "*.apk" | head -n 1)
+          APK_PATH=$(find LongShotPDF/app/build/outputs/apk/release app/build/outputs/apk/release -name "*.apk" 2>/dev/null | head -n 1)
           if [ -z "$APK_PATH" ] || [ ! -f "$APK_PATH" ]; then
             echo "::error title=APK Not Found::Release APK build did not produce an output file."
             exit 1

@@ -253,7 +253,7 @@ fun AboutScreen(
                         .height(280.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    // Top-Left Animated M3 Expressive "Bun" Shape
+                    // Top-Left Animated M3 Expressive "Bun" Shape (from assests/Images/Expressive Shapes)
                     Box(
                         modifier = Modifier
                             .align(Alignment.CenterStart)
@@ -262,22 +262,12 @@ fun AboutScreen(
                                 rotationZ = bunRotation
                             }
                     ) {
-                        Canvas(modifier = Modifier.size(135.dp)) {
-                            val c = Offset(size.width / 2f, size.height / 2f)
-                            val baseR = size.width * 0.40f
-                            val path = Path()
-                            val steps = 72
-                            for (i in 0..steps) {
-                                val angle = i * (2.0 * PI / steps)
-                                val modulation = 1f + 0.22f * cos(angle * 2.0).toFloat() - 0.14f * sin(angle).toFloat()
-                                val curR = baseR * modulation
-                                val x = c.x + (curR * cos(angle)).toFloat()
-                                val y = c.y + (curR * sin(angle)).toFloat()
-                                if (i == 0) path.moveTo(x, y) else path.lineTo(x, y)
-                            }
-                            path.close()
-                            drawPath(path, color = Color(0xFF0078D4).copy(alpha = 0.88f))
-                        }
+                        Icon(
+                            painter = painterResource(id = R.drawable.shape_bun),
+                            contentDescription = "Expressive Bun Shape",
+                            tint = Color(0xFF0078D4).copy(alpha = 0.88f),
+                            modifier = Modifier.size(135.dp)
+                        )
                     }
 
                     // Bottom-Right Animated M3 Expressive "9-Side Cookie" Shape

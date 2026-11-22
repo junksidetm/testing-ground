@@ -3,61 +3,243 @@ name: Universal Multi-App Release Builder
 on:
   workflow_dispatch:
     inputs:
-      release_tag:
-        description: 'Target Semantic Version Tag (must match v<Version> e.g. v2.0.0)'
+      updated_app:
+        description: 'Which application was updated?'
         required: true
-        default: 'v1.0.0'
-      build_longshot:
-        description: 'Build Long Shot PDF Engine'
-        type: boolean
-        default: true
-      build_iconpack:
-        description: 'Build Pix Material You Icon Pack'
-        type: boolean
-        default: true
+        type: choice
+        options:
+          - 'LongShotPDF'
+          - 'Pix Material You Icon Pack Mod'
+          - 'Both / All Apps'
+        default: 'LongShotPDF'
+      release_tag:
+        description: 'Target Semantic Version Tag (leave empty to auto-detect from updated app version)'
+        required: false
+        default: ''
+      custom_notes:
+        description: 'Custom notes / changelog describing what was updated'
+        required: false
+        default: ''
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  orchestrate-release:
-    name: Prepare Universal Release
+  build-and-release-all:
+    name: Build All Apps & Publish Bundle
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     permissions:
       contents: write
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Ensure Release Tag Exists
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Set up Gradle 8.10.2
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.10.2'
+
+      - name: Install Android Build Tools & Apktool
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y zipalign apksigner wget curl
+          echo "Installing Apktool 2.10.0..."
+          sudo wget -q https://raw.githubusercontent.com/iBotPeaches/Apktool/master/scripts/linux/apktool -O /usr/local/bin/apktool
+          sudo wget -q https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_2.10.0.jar -O /usr/local/bin/apktool.jar
+          sudo chmod +x /usr/local/bin/apktool /usr/local/bin/apktool.jar
+          apktool --version
+
+      - name: Detect Versions & Configure Release Title
+        id: meta
+        run: |
+          # 1. Detect LongShotPDF version
+          LONGSHOT_VER=$(grep 'versionName = ' LongShotPDF/app/build.gradle.kts | head -n 1 | sed -E 's/.*"([^"]+)".*/\1/')
+          if [ -z "$LONGSHOT_VER" ]; then
+            LONGSHOT_VER="1.0.5"
+          fi
+          echo "LONGSHOT_VER=$LONGSHOT_VER" >> $GITHUB_OUTPUT
+          echo "LongShotPDF version: $LONGSHOT_VER"
+
+          # 2. Detect Pix Material You version
+          if [ -f "Pix Material You Icon Pack Mod/version.txt" ]; then
+            ICONPACK_VER=$(tr -d '\r\n' < "Pix Material You Icon Pack Mod/version.txt")
+          else
+            ICONPACK_VER="6.1.7"
+          fi
+          echo "ICONPACK_VER=$ICONPACK_VER" >> $GITHUB_OUTPUT
+          echo "Pix Material You version: $ICONPACK_VER"
+
+          # 3. Determine Tag & Title
+          UPDATED_APP="${{ inputs.updated_app }}"
+          CUSTOM_TAG="${{ inputs.release_tag }}"
+
+          if [ -n "$CUSTOM_TAG" ]; then
+            FINAL_TAG="$CUSTOM_TAG"
+          elif [ "$UPDATED_APP" = "Pix Material You Icon Pack Mod" ]; then
+            FINAL_TAG="v$ICONPACK_VER"
+          else
+            FINAL_TAG="v$LONGSHOT_VER"
+          fi
+
+          if [ "$UPDATED_APP" = "LongShotPDF" ]; then
+            RELEASE_TITLE="LongShotPDF updated to v${LONGSHOT_VER}"
+          elif [ "$UPDATED_APP" = "Pix Material You Icon Pack Mod" ]; then
+            RELEASE_TITLE="Pix Material You Icon Pack updated to v${ICONPACK_VER}"
+          else
+            RELEASE_TITLE="Testing Ground Apps updated to ${FINAL_TAG}"
+          fi
+
+          echo "FINAL_TAG=$FINAL_TAG" >> $GITHUB_OUTPUT
+          echo "RELEASE_TITLE=$RELEASE_TITLE" >> $GITHUB_OUTPUT
+
+      # -------------------------------------------------------------------------
+      # BUILD APP 1: LongShotPDF
+      # -------------------------------------------------------------------------
+      - name: Build LongShotPDF Release APK
+        run: |
+          chmod +x gradlew
+          ./gradlew :app:assembleRelease --no-daemon --stacktrace
+          
+          BUILT_APK=$(find LongShotPDF/app/build/outputs/apk/release app/build/outputs/apk/release -name "*.apk" 2>/dev/null | head -n 1)
+          if [ -z "$BUILT_APK" ] || [ ! -f "$BUILT_APK" ]; then
+            echo "::error title=APK Not Found::LongShotPDF APK build did not produce an output file."
+            exit 1
+          fi
+          
+          zipalign -p -f -v 4 "$BUILT_APK" longshot_aligned.apk
+          
+          keytool -genkey -v -keystore longshot_release.jks \
+            -alias longshot_key -keyalg RSA -keysize 2048 -validity 10000 \
+            -storepass android -keypass android \
+            -dname "CN=LongShotPDF, OU=TestingGround, O=Junkside, L=World, ST=Global, C=US"
+            
+          LONGSHOT_OUTPUT="LongShot-PDF-v${{ steps.meta.outputs.LONGSHOT_VER }}.apk"
+          apksigner sign --ks longshot_release.jks --ks-key-alias longshot_key \
+            --ks-pass pass:android --key-pass pass:android \
+            --v1-signing-enabled true --v2-signing-enabled true --v3-signing-enabled true \
+            --out "$LONGSHOT_OUTPUT" longshot_aligned.apk
+            
+          apksigner verify --verbose "$LONGSHOT_OUTPUT"
+          echo "LONGSHOT_APK=$LONGSHOT_OUTPUT" >> $GITHUB_OUTPUT
+
+      # -------------------------------------------------------------------------
+      # BUILD APP 2: Pix Material You Icon Pack Mod
+      # -------------------------------------------------------------------------
+      - name: Build Pix Material You Icon Pack Mod
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          TAG="${{ inputs.release_tag }}"
-          if ! gh release view "$TAG" &>/dev/null; then
-            echo "Initializing release $TAG..."
-            gh release create "$TAG" --title "$TAG" --notes "Universal release bundle for Testing Ground apps."
-          else
-            echo "Release $TAG already exists."
+          ICON_VER="${{ steps.meta.outputs.ICONPACK_VER }}"
+          OUTPUT_ICON_APK="Pix-Material-You-v${ICON_VER}-Modded.apk"
+
+          # Check if base.apk exists or download base APK from prior release
+          if [ ! -f "base.apk" ]; then
+            mkdir -p base_download/
+            gh release download "v6.1.7" --pattern "*Modded.apk" --dir base_download/ || \
+            gh release download "v6.1.6" --pattern "*.apk" --dir base_download/ || true
+            
+            FOUND_BASE=$(find base_download/ -type f -name "*.apk" | head -n 1)
+            if [ -n "$FOUND_BASE" ]; then
+              cp "$FOUND_BASE" base.apk
+            fi
           fi
 
-  build-longshot:
-    name: Build Long Shot PDF
-    needs: orchestrate-release
-    if: ${{ inputs.build_longshot }}
-    uses: ./.github/workflows/build-longshot-pdf.yml
-    with:
-      release_tag: ${{ inputs.release_tag }}
-      publish_release: true
-    secrets: inherit
+          if [ -f "base.apk" ]; then
+            echo "Decompiling base.apk for resource injection..."
+            apktool d -s -f base.apk -o decompiled_apk
+            
+            TARGET_MIPMAP="decompiled_apk/res/mipmap-xxxhdpi"
+            if [ ! -d "$TARGET_MIPMAP" ]; then
+              TARGET_MIPMAP="decompiled_apk/res/mipmap-xxxhdpi-v4"
+            fi
+            mkdir -p "$TARGET_MIPMAP"
+            cp "Pix Material You Icon Pack Mod/custom_icons/res/mipmap-xxxhdpi-v4"/*.png "$TARGET_MIPMAP/"
+            
+            mkdir -p decompiled_apk/res/drawable-anydpi-v26
+            cp "Pix Material You Icon Pack Mod/custom_icons/res/drawable-anydpi-v26"/*.xml decompiled_apk/res/drawable-anydpi-v26/
+            
+            python3 "Pix Material You Icon Pack Mod/patch_decompiled.py" decompiled_apk "Pix Material You Icon Pack Mod/custom_icons"
+            python3 "Pix Material You Icon Pack Mod/sanitize_for_aapt2.py" decompiled_apk
+            
+            apktool b --use-aapt2 decompiled_apk -o iconpack_unaligned.apk
+            zipalign -p -f -v 4 iconpack_unaligned.apk iconpack_aligned.apk
+            
+            keytool -genkey -v -keystore iconpack_release.jks \
+              -alias iconpack_key -keyalg RSA -keysize 2048 -validity 10000 \
+              -storepass android -keypass android \
+              -dname "CN=PixMaterialYouMod, OU=TestingGround, O=Junkside, L=World, ST=Global, C=US"
+              
+            apksigner sign --ks iconpack_release.jks --ks-key-alias iconpack_key \
+              --ks-pass pass:android --key-pass pass:android \
+              --v1-signing-enabled true --v2-signing-enabled true --v3-signing-enabled true \
+              --out "$OUTPUT_ICON_APK" iconpack_aligned.apk
+          else
+            echo "::warning title=Base APK Not Acquired::Could not locate base.apk, attempting download from latest asset..."
+            gh release download --pattern "Pix-Material-You-*.apk" --output "$OUTPUT_ICON_APK" || true
+          fi
 
-  build-iconpack:
-    name: Build Icon Pack
-    needs: orchestrate-release
-    if: ${{ inputs.build_iconpack }}
-    uses: ./.github/workflows/build-iconpack.yml
-    with:
-      release_tag: ${{ inputs.release_tag }}
-      create_release: true
-    secrets: inherit
+          echo "ICONPACK_APK=$OUTPUT_ICON_APK" >> $GITHUB_OUTPUT
+
+      # -------------------------------------------------------------------------
+      # PUBLISH ALL APKS TO GITHUB RELEASE
+      # -------------------------------------------------------------------------
+      - name: Publish All Applications to GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ steps.meta.outputs.FINAL_TAG }}"
+          TITLE="${{ steps.meta.outputs.RELEASE_TITLE }}"
+          UPDATED_APP="${{ inputs.updated_app }}"
+          CUSTOM_NOTES="${{ inputs.custom_notes }}"
+          LONGSHOT_APK="LongShot-PDF-v${{ steps.meta.outputs.LONGSHOT_VER }}.apk"
+          ICONPACK_APK="Pix-Material-You-v${{ steps.meta.outputs.ICONPACK_VER }}-Modded.apk"
+
+          # Assemble release notes
+          NOTES_FILE="release_notes.md"
+          echo "## 🧪 Testing Ground Multi-App Release" > $NOTES_FILE
+          echo "" >> $NOTES_FILE
+          echo "### 🚀 What Was Updated" >> $NOTES_FILE
+          if [ -n "$CUSTOM_NOTES" ]; then
+            echo "$CUSTOM_NOTES" >> $NOTES_FILE
+          else
+            echo "* **Active Update:** **$UPDATED_APP**" >> $NOTES_FILE
+          fi
+          echo "" >> $NOTES_FILE
+          echo "### 📦 Bundled Application Deliverables" >> $NOTES_FILE
+          echo "* \`$LONGSHOT_APK\` — LongShotPDF (v${{ steps.meta.outputs.LONGSHOT_VER }})" >> $NOTES_FILE
+          echo "* \`$ICONPACK_APK\` — Pix Material You Icon Pack (v${{ steps.meta.outputs.ICONPACK_VER }})" >> $NOTES_FILE
+          echo "" >> $NOTES_FILE
+          echo "> All hosted applications in Testing Ground are bundled with each release. Unchanged applications retain their current stable build." >> $NOTES_FILE
+
+          # Upload or create release
+          if gh release view "$TAG" &>/dev/null; then
+            echo "Updating existing release $TAG..."
+            gh release edit "$TAG" --title "$TITLE" --notes-file "$NOTES_FILE"
+            gh release upload "$TAG" "$LONGSHOT_APK" --clobber
+            if [ -f "$ICONPACK_APK" ]; then
+              gh release upload "$TAG" "$ICONPACK_APK" --clobber
+            fi
+          else
+            echo "Creating new release $TAG..."
+            ASSETS_TO_UPLOAD=("$LONGSHOT_APK")
+            if [ -f "$ICONPACK_APK" ]; then
+              ASSETS_TO_UPLOAD+=("$ICONPACK_APK")
+            fi
+            gh release create "$TAG" "${ASSETS_TO_UPLOAD[@]}" --title "$TITLE" --notes-file "$NOTES_FILE"
+          fi

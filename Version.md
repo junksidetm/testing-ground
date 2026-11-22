@@ -233,3 +233,34 @@
   - Connected navigation in `MainActivity.kt` and added About action icon to `HomeScreen.kt` TopAppBar with back-handler navigation support.
   - Bumped version to `v1.0.5` (`versionCode: 6`).
   - Updated `README.md` catalog to point to `v1.0.5`.
+
+
+---
+
+### [Visual Refinement: Official M3 Expressive Bun Shape] - 2026-11-22 19:50:00 IST
+- **Status:** Completed (100%)
+- **Target App:** LongShotPDF (`v1.0.5`, `versionCode: 6`)
+- **Deliverables:**
+  - Replaced the procedural Canvas approximation of the M3 Expressive "Bun" shape with the authentic official vector asset from `assests/Images/Expressive Shapes/android_drawable/shape_bun.xml`.
+  - Added `app/src/main/res/drawable/shape_bun.xml` containing the exact Material 3 Expressive Bun path geometry.
+  - Updated `AboutScreen.kt` hero visualizer to render `R.drawable.shape_bun` via `Icon` with dynamic tinting (`#0078D4`, 88% alpha), retaining ambient floating (`bunOffsetY`) and subtle rotation (`bunRotation`) motion physics.
+
+
+---
+
+### [Architecture Evolution: Folder-Specific Multi-App Testing Ground & Universal Release Pipeline] - 2026-11-22 20:30:00 IST
+- **Status:** Completed (100%)
+- **Target Scope:** Entire Repository / Multi-App Architecture (`LongShotPDF` & `Pix Material You Icon Pack Mod`)
+- **Deliverables:**
+  - **Folder-Specific App Isolation:** Restructured the repository into isolated, self-contained application workspaces:
+    - `LongShotPDF/`: Contains all code, Android app module, assets, documentation (`docs/`), and standalone Gradle build wrappers for LongShotPDF. Root `settings.gradle.kts` dynamically points `:app` to `LongShotPDF/app`.
+    - `Pix Material You Icon Pack Mod/`: Contains all modding scripts (`patch_apk.py`, `patch_decompiled.py`, `sanitize_for_aapt2.py`), custom adaptive vector drawables, mipmaps, and version tracking (`version.txt`). Retired legacy `tools/` folder.
+  - **Repository Governance & Licensing:**
+    - Created Apache License, Version 2.0 (`LICENSE`) at repository root.
+    - Updated root `README.md` documenting testing-ground as an emerging application incubation lab where apps are tested and stabilized before graduating to their own independent repositories.
+  - **Universal Multi-App Release Workflow (`build-all-apps.yml`):**
+    - Implemented universal dual-app packaging: whenever a release is triggered, builds both `LongShot-PDF-v<version>.apk` and `Pix-Material-You-v<version>-Modded.apk`.
+    - Supports dynamic release titling (e.g. `LongShotPDF updated to vX.X.X` or `Pix Material You Icon Pack updated to vX.X.X`).
+    - Release notes explicitly identify which application was updated while bundling current stable builds of unchanged applications.
+    - Standardized output artifact naming: `LongShot-PDF-v<version>.apk` and `Pix-Material-You-v<version>-Modded.apk`.
+  - **CI/CD Alignment:** Updated `build-longshot-pdf.yml`, `verify-longshot-pdf.yml`, `build-iconpack.yml`, and `release.yml` with the new folder-specific paths.
