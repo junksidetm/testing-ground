@@ -264,3 +264,17 @@
     - Release notes explicitly identify which application was updated while bundling current stable builds of unchanged applications.
     - Standardized output artifact naming: `LongShot-PDF-v<version>.apk` and `Pix-Material-You-v<version>-Modded.apk`.
   - **CI/CD Alignment:** Updated `build-longshot-pdf.yml`, `verify-longshot-pdf.yml`, `build-iconpack.yml`, and `release.yml` with the new folder-specific paths.
+
+
+---
+
+### [Release v1.1.0: LongShotPDF Official Brand Logo, M3 Bun Shape & Universal About Screen] - 2026-11-23 20:40:00 IST
+- **Status:** Completed (100% & Published Live)
+- **Target Scope:** `LongShotPDF/`
+- **Release:** `v1.1.0` (versionCode 7)
+- **Release Portal:** [testing-ground v1.1.0 Release](https://github.com/junksidetm/testing-ground/releases/tag/v1.1.0)
+- **Deliverables:**
+  - `LongShot-PDF-v1.1.0.apk`: Production-signed release APK with v1, v2, v3 signature schemes and 4-byte zip alignment.
+  - Ingested official brand logo `LongShotPdf - Logo.svg` in `LongShotPDF/app/` and `assests/Images/Logos/`.
+  - Implemented the official Material 3 Expressive Bun shape (`shape_bun.xml`) and 9-side cookie shape (`shape_9_side_cookie.xml`) in `AboutScreen.kt`.
+  - Bumped version to `1.1.0` in `LongShotPDF/app/build.gradle.kts`.
