@@ -323,3 +323,14 @@
   - Ingested authentic icon and metadata bundles into `paisa-mod/assets/icon/` and `paisa-mod/assets/metadata/`.
   - Re-mapped font declaration in `pubspec.yaml` to point directly to `assets/fonts/GoogleSansFlex-Variable.ttf` and `assets/fonts/NotoSans-Regular.ttf` / `NotoSans-Bold.ttf`.
   - Pruned non-existent asset path entries, guaranteeing 100% asset resolution in Flutter `aot_android_asset_bundle`.
+
+---
+### [Release v6.0.0: Paisa Unrestricted Mod Live Release] - 2026-11-24 01:53:00 IST
+- **Status:** Completed (100% & Published Live)
+- **Target Scope:** Entire Repository / Multi-App Architecture (`paisa-mod/` & `LongShotPDF/`)
+- **Release:** `v6.0.0`
+- **Release Portal:** [testing-ground v6.0.0 Release](https://github.com/junksidetm/testing-ground/releases/tag/v6.0.0)
+- **Workflow Run:** [Run #45257886026](https://github.com/junksidetm/testing-ground/actions/runs/45257886026)
+- **Published Deliverables:**
+  - `Paisa-Unrestricted-v6.0.0.apk`: Clean-room unrestricted personal finance manager with embedded local Desktop Web Companion on port 8080, Google Sans Flex variable typography, and zero anti-tamper/paywall locks.
+  - `LongShot-PDF-v1.1.0.apk`: Bundled stable companion APK for LongShotPDF.
