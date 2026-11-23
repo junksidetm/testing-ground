@@ -11,7 +11,6 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -23,15 +22,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -74,9 +70,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -88,29 +83,26 @@ import androidx.compose.ui.unit.sp
 import com.mrdarksidetm.longshotpdf.BuildConfig
 import com.mrdarksidetm.longshotpdf.R
 import kotlinx.coroutines.launch
-import kotlin.math.PI
-import kotlin.math.cos
-import kotlin.math.sin
 
 /**
  * =========================================================================================
  * UNIVERSAL ABOUT PAGE: LongShotPDF
  *
- * Design Spec:
+ * Design Architecture:
  * 1. Top bar with navigation back button.
  * 2. Hero Visualizer:
  *    - Main Container: Squircle (RoundedCornerShape(44.dp)) with subtle outline border.
- *    - App Icon: Centers inside squircle and fills exactly 75% of the space (150dp).
+ *    - App Logo: Centers inside squircle and fills exactly 75% of the space (R.drawable.app_logo).
  *    - Ambient Organic Shapes:
- *      * Top-left: M3 Expressive "Bun" shape (floating/rotating ~14s).
- *      * Bottom-right: M3 Expressive "9-Side Cookie" shape (rotating/scaling ~32s).
+ *      * Top-left: M3 Expressive "Bun" shape (R.drawable.shape_bun, floating/rotating ~14s).
+ *      * Bottom-right: M3 Expressive "9-Side Cookie" shape (R.drawable.shape_9_side_cookie, rotating/scaling ~32s).
  * 3. App Title & Dynamic Version Badge:
  *    - Reads BuildConfig.VERSION_NAME automatically on every release.
  *    - 7-tap Easter Egg counter activating Developer Mode.
  * 4. Developer Profile Card:
- *    - Avatar (developer.png) + "Abhijeet Yadav" + "Developer".
- *    - Action pills: GitHub (points to repository) & Email.
- * 5. Community FOSS "The Other's Way" Connected Settings List:
+ *    - Avatar (R.drawable.developer) + "Abhijeet Yadav" + "Developer".
+ *    - Action pills: GitHub (points to exact repository) & Email.
+ * 5. Community FOSS "The Other's Way" List (June Connected Settings from Pulse Studio):
  *    - 28dp rounded container, 2dp separation, position-aware adaptive corners,
  *      spring press morphing, and vertically centered leading icons.
  *    - Licenses opens an in-app bottom sheet.
@@ -120,21 +112,18 @@ import kotlin.math.sin
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AboutScreen(
-    onBack: () -> Unit,
+    onBack: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    // Dynamic app version from Gradle BuildConfig
     val appVersion = BuildConfig.VERSION_NAME
 
-    // In-app License Sheet State
     var showLicenseSheet by remember { mutableStateOf(false) }
     val licenseSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    // Easter Egg Tap Counter
     var versionTapCount by remember { mutableIntStateOf(0) }
     var lastTapTime by remember { mutableLongStateOf(0L) }
 
@@ -149,7 +138,7 @@ fun AboutScreen(
         coroutineScope.launch {
             if (versionTapCount >= 7) {
                 versionTapCount = 0
-                snackbarHostState.showSnackbar("🎉 Developer Mode / Error Collector Activated!")
+                snackbarHostState.showSnackbar("🎉 Developer Mode Activated!")
             } else if (versionTapCount >= 3) {
                 val remaining = 7 - versionTapCount
                 snackbarHostState.showSnackbar("You are $remaining step${if (remaining > 1) "s" else ""} away from Developer Mode")
@@ -158,11 +147,16 @@ fun AboutScreen(
     }
 
     fun openUrl(url: String) {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-        context.startActivity(intent)
+        try {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            context.startActivity(intent)
+        } catch (e: Exception) {
+            coroutineScope.launch {
+                snackbarHostState.showSnackbar("Could not open link: $url")
+            }
+        }
     }
 
-    // Ambient Infinite Motion for M3 Expressive Shapes (Bun Shape & 9-Side Cookie)
     val infiniteTransition = rememberInfiniteTransition(label = "AboutShapesAmbient")
 
     val bunRotation by infiniteTransition.animateFloat(
@@ -197,17 +191,13 @@ fun AboutScreen(
         initialValue = 0.95f,
         targetValue = 1.05f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 7500, easing = LinearEasing),
+            animation = tween(durationMillis = 6000, easing = LinearEasing),
             repeatMode = RepeatMode.Reverse
         ),
         label = "CookieScale"
     )
 
     Scaffold(
-        modifier = modifier
-            .fillMaxSize()
-            .statusBarsPadding()
-            .navigationBarsPadding(),
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
@@ -226,15 +216,15 @@ fun AboutScreen(
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+                    containerColor = MaterialTheme.colorScheme.surface,
                     titleContentColor = MaterialTheme.colorScheme.onSurface
                 )
             )
         },
-        containerColor = MaterialTheme.colorScheme.surfaceContainerLowest
+        containerColor = MaterialTheme.colorScheme.surface
     ) { innerPadding ->
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
@@ -245,7 +235,7 @@ fun AboutScreen(
                     .padding(top = 16.dp, bottom = 32.dp)
             ) {
                 // -------------------------------------------------------------------------
-                // HERO ILLUSTRATION: SQUIRCLE CONTAINER + 75% APP ICON + M3 EXPRESSIVE SHAPES
+                // HERO ILLUSTRATION: SQUIRCLE CONTAINER + 75% APP LOGO + M3 EXPRESSIVE SHAPES
                 // -------------------------------------------------------------------------
                 Box(
                     modifier = Modifier
@@ -253,7 +243,7 @@ fun AboutScreen(
                         .height(280.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    // Top-Left Animated M3 Expressive "Bun" Shape (from assests/Images/Expressive Shapes)
+                    // Top-Left Animated M3 Expressive "Bun" Shape (from Expressive Shapes)
                     Box(
                         modifier = Modifier
                             .align(Alignment.CenterStart)
@@ -262,11 +252,13 @@ fun AboutScreen(
                                 rotationZ = bunRotation
                             }
                     ) {
-                        Icon(
+                        Image(
                             painter = painterResource(id = R.drawable.shape_bun),
                             contentDescription = "Expressive Bun Shape",
-                            tint = Color(0xFF0078D4).copy(alpha = 0.88f),
-                            modifier = Modifier.size(135.dp)
+                            modifier = Modifier.size(135.dp),
+                            colorFilter = ColorFilter.tint(
+                                MaterialTheme.colorScheme.secondary.copy(alpha = 0.88f)
+                            )
                         )
                     }
 
@@ -281,25 +273,17 @@ fun AboutScreen(
                                 scaleY = cookieScale
                             }
                     ) {
-                        Canvas(modifier = Modifier.size(145.dp)) {
-                            val c = Offset(size.width / 2f, size.height / 2f)
-                            val baseR = size.width * 0.40f
-                            val path = Path()
-                            val steps = 90
-                            for (i in 0..steps) {
-                                val angle = i * (2.0 * PI / steps)
-                                val mod = 1f + 0.16f * sin(angle * 9.0).toFloat()
-                                val curR = baseR * mod
-                                val x = c.x + (curR * cos(angle)).toFloat()
-                                val y = c.y + (curR * sin(angle)).toFloat()
-                                if (i == 0) path.moveTo(x, y) else path.lineTo(x, y)
-                            }
-                            path.close()
-                            drawPath(path, color = Color(0xFF758AEF).copy(alpha = 0.88f))
-                        }
+                        Image(
+                            painter = painterResource(id = R.drawable.shape_9_side_cookie),
+                            contentDescription = "Expressive 9-Side Cookie Shape",
+                            modifier = Modifier.size(145.dp),
+                            colorFilter = ColorFilter.tint(
+                                MaterialTheme.colorScheme.tertiary.copy(alpha = 0.88f)
+                            )
+                        )
                     }
 
-                    // Main Icon Squircle Container (App Icon fills exactly 75% of space: 150dp / 200dp)
+                    // Main Logo Squircle Container (App Logo fills exactly 75% of space: 150dp / 200dp)
                     Surface(
                         modifier = Modifier
                             .size(200.dp)
@@ -317,7 +301,7 @@ fun AboutScreen(
                         ) {
                             Image(
                                 painter = painterResource(id = R.drawable.app_logo),
-                                contentDescription = "App Icon",
+                                contentDescription = "App Logo",
                                 modifier = Modifier
                                     .size(150.dp)
                                     .clip(RoundedCornerShape(32.dp))
@@ -341,6 +325,16 @@ fun AboutScreen(
                         fontWeight = FontWeight.Black,
                         letterSpacing = (-0.5).sp,
                         textAlign = TextAlign.Center
+                    )
+
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    Text(
+                        text = "Seamless long screenshot to high-resolution vector PDF converter.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(horizontal = 16.dp)
                     )
 
                     Spacer(modifier = Modifier.height(10.dp))
@@ -395,7 +389,6 @@ fun AboutScreen(
                                 .padding(horizontal = 16.dp, vertical = 10.dp),
                             horizontalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
-                            // GitHub Pill Button
                             Surface(
                                 onClick = { openUrl("https://github.com/junksidetm/testing-ground") },
                                 shape = RoundedCornerShape(100),
@@ -422,7 +415,6 @@ fun AboutScreen(
                                 }
                             }
 
-                            // Email Pill Button
                             Surface(
                                 onClick = { openUrl("mailto:contact.dsidetm@gmail.com") },
                                 shape = RoundedCornerShape(100),
@@ -455,7 +447,7 @@ fun AboutScreen(
                 Spacer(modifier = Modifier.height(18.dp))
 
                 // -------------------------------------------------------------------------
-                // JUNE CONNECTED SETTINGS ARCHITECTURE (Pulse Studio standard)
+                // COMMUNITY FOSS "THE OTHER'S WAY" LIST (JUNE CONNECTED SETTINGS)
                 // -------------------------------------------------------------------------
                 JuneSettingsGroup(
                     modifier = Modifier.padding(horizontal = 16.dp)
@@ -504,7 +496,7 @@ fun AboutScreen(
                 Spacer(modifier = Modifier.height(36.dp))
 
                 // -------------------------------------------------------------------------
-                // FOOTER: "Made with ❤️"
+                // FOOTER
                 // -------------------------------------------------------------------------
                 Box(
                     modifier = Modifier.fillMaxWidth(),
@@ -621,9 +613,6 @@ fun AboutScreen(
     }
 }
 
-/**
- * Connected settings group container with 28dp rounded perimeter.
- */
 @Composable
 fun JuneSettingsGroup(
     modifier: Modifier = Modifier,
@@ -638,9 +627,6 @@ fun JuneSettingsGroup(
     )
 }
 
-/**
- * Connected setting tile with position-aware adaptive corners and spring press morphing.
- */
 @Composable
 fun JuneSettingsTile(
     title: String,
@@ -662,39 +648,48 @@ fun JuneSettingsTile(
             dampingRatio = Spring.DampingRatioMediumBouncy,
             stiffness = Spring.StiffnessMediumLow
         ),
-        label = "TileCornerMorph"
+        label = "juneConnectedItemCornerAnim"
     )
 
-    val shape = when {
-        count == 1 -> RoundedCornerShape(28.dp)
-        index == 0 -> RoundedCornerShape(
-            topStart = 28.dp,
-            topEnd = 28.dp,
-            bottomStart = animatedCorner,
-            bottomEnd = animatedCorner
-        )
-        index == count - 1 -> RoundedCornerShape(
-            topStart = animatedCorner,
-            topEnd = animatedCorner,
-            bottomStart = 28.dp,
-            bottomEnd = 28.dp
-        )
-        else -> RoundedCornerShape(animatedCorner)
+    val itemShape = remember(index, count, animatedCorner) {
+        when {
+            count <= 1 -> RoundedCornerShape(28.dp)
+            index == 0 -> RoundedCornerShape(
+                topStart = 28.dp,
+                topEnd = 28.dp,
+                bottomStart = animatedCorner,
+                bottomEnd = animatedCorner
+            )
+            index == count - 1 -> RoundedCornerShape(
+                topStart = animatedCorner,
+                topEnd = animatedCorner,
+                bottomStart = 28.dp,
+                bottomEnd = 28.dp
+            )
+            else -> RoundedCornerShape(animatedCorner)
+        }
     }
 
     Surface(
-        onClick = { onClick?.invoke() },
-        enabled = isClickable,
-        shape = shape,
-        color = MaterialTheme.colorScheme.surfaceContainerHigh,
-        interactionSource = interactionSource,
-        modifier = modifier.fillMaxWidth()
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+        shape = itemShape,
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(itemShape)
+            .then(
+                if (isClickable) {
+                    Modifier.clickable(
+                        interactionSource = interactionSource,
+                        indication = ripple(),
+                        onClick = onClick!!
+                    )
+                } else Modifier
+            )
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .defaultMinSize(minHeight = 64.dp)
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .padding(horizontal = 16.dp, vertical = 14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (leadingIcon != null) {
@@ -707,14 +702,11 @@ fun JuneSettingsTile(
                 Spacer(modifier = Modifier.width(16.dp))
             }
 
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.Center
-            ) {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Medium,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 if (subtitle != null) {
@@ -729,11 +721,7 @@ fun JuneSettingsTile(
 
             if (trailingContent != null) {
                 Spacer(modifier = Modifier.width(12.dp))
-                Box(
-                    contentAlignment = Alignment.Center
-                ) {
-                    trailingContent()
-                }
+                trailingContent()
             }
         }
     }
