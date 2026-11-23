@@ -289,3 +289,12 @@
   - **Local Desktop Web Companion:** Integrated `WebCompanionService` (`lib/core/services/web_companion_service.dart`) serving the extracted Material 3 single-page dashboard (`assets/web_companion/index.html`) over local Wi-Fi on port `8080`.
   - **Anti-Tamper & Paywall Stripping:** Established clean-room architecture completely free of PairIP anti-tamper checks, Google Play licensing, and RevenueCat paywalls. All accounts, budgets, goals, and recurring transactions operate with zero artificial caps.
   - **Universal CI/CD Pipeline:** Dedicated GitHub Actions build workflow in `paisa-mod/.github/workflows/build_apks.yml` generating Universal, ARM64, and ARMv7 APKs remotely to protect local 4 GB RAM host hardware.
+
+---
+### [CI/CD Universal Multi-App Release Builder Update] - 2026-11-24 01:30:00 IST
+- **Status:** Completed (100%)
+- **Target Scope:** `.github/workflows/build-all-apps.yml`
+- **Deliverables:**
+  - **Paisa-Mod Release Pipeline Integration:** Wired `Paisa Unrestricted Mod` into the universal release builder workflow, adding automated Flutter environment setup (`subosito/flutter-action@v2`), `pub get`, `build_runner`, and release APK packaging.
+  - **Triple-App Deliverable Bundling:** Releases now build and bundle `LongShot-PDF-v<version>.apk`, `Pix-Material-You-v<version>-Modded.apk`, and `Paisa-Unrestricted-v<version>.apk`.
+  - **GEMINI.md Release Title Alignment:** Standardized `RELEASE_TITLE` to strictly match `$FINAL_TAG` (`v<Version>`), adhering to the workspace-wide release titling mandate.
