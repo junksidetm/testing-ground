@@ -314,3 +314,12 @@
 - **Deliverables:**
   - Replaced stale absolute package import `package:wallet/core/theme/color_extension.dart` with standard relative import `../../../core/theme/color_extension.dart`, resolving Dart kernel snapshot compilation failure during Flutter AOT release build.
   - Made release APK output path resolution in `build-all-apps.yml` robust using `find paisa-mod/build -name "*release*.apk"`.
+
+---
+### [Asset Ingestion & Pubspec Resolution: Verified Assets & Variable Fonts] - 2026-11-24 01:47:00 IST
+- **Status:** Completed (100%)
+- **Target Scope:** `paisa-mod/pubspec.yaml` & `paisa-mod/assets/`
+- **Deliverables:**
+  - Ingested authentic icon and metadata bundles into `paisa-mod/assets/icon/` and `paisa-mod/assets/metadata/`.
+  - Re-mapped font declaration in `pubspec.yaml` to point directly to `assets/fonts/GoogleSansFlex-Variable.ttf` and `assets/fonts/NotoSans-Regular.ttf` / `NotoSans-Bold.ttf`.
+  - Pruned non-existent asset path entries, guaranteeing 100% asset resolution in Flutter `aot_android_asset_bundle`.

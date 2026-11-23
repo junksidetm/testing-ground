@@ -103,37 +103,26 @@ flutter:
     - assets/fonts/
     - assets/onboarding/
     - assets/images/
-    - assets/images/blueprint.svg
     - assets/icon/
     - assets/metadata/
 
   fonts:
     - family: GoogleSansFlex
       fonts:
-        - asset: assets/fonts/GoogleSansFlex/google_sans_flex.ttf
+        - asset: assets/fonts/GoogleSansFlex-Variable.ttf
 
-    - family: AppleColorEmoji
+    - family: NotoSans
       fonts:
-        - asset: assets/fonts/Emoji/iOS15.4_Fixed_space.ttf
-
-    # Icon fonts come from material_symbols_icons, flutter_material_design_icons
-    # and font_awesome_flutter (bundled under packages/...). The duplicate
-    # families that used to be declared here (~35 MB) were never referenced.
+        - asset: assets/fonts/NotoSans-Regular.ttf
+        - asset: assets/fonts/NotoSans-Bold.ttf
+          weight: 700
 
 flutter_launcher_icons:
   android: true
   ios: true
   remove_alpha_ios: true
-  # 1. Android Legacy / Package Installer: High-res PNG
   image_path_android: "assets/icon/original.png" 
-  
-  # 2. iOS Icon: High-res PNG
   image_path_ios: "assets/icon/original.png"
-  
-  # 3. Adaptive Background (Used by Android Home Screen)
   adaptive_icon_background: "#FFFFFF" 
-  
-  # 4. Adaptive Foreground (Used by Android Home Screen): PNG for tool compatibility
   adaptive_icon_foreground: "assets/icon/original.png"
   adaptive_icon_monochrome: "assets/icon/monochrome.png"
-
