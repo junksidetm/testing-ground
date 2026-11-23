@@ -1,0 +1,226 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'package:intl/intl.dart';
+import '../../../core/database/providers.dart';
+import '../../../core/database/models/category.dart';
+import 'package:go_router/go_router.dart';
+import '../../../core/widgets/transaction_segmented_group.dart';
+import '../../../core/widgets/icon_picker.dart';
+import '../../../core/widgets/app_back_button.dart';
+import 'package:wallet/core/theme/color_extension.dart';
+
+class CategoryDetailsPage extends ConsumerWidget {
+  final Category category;
+  const CategoryDetailsPage({super.key, required this.category});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final categoryColor = category.color.parseHexColor();
+
+    final statsAsync = ref.watch(categoryMonthlyStatsProvider(category.id));
+    final allTransactionsAsync = ref.watch(transactionsStreamProvider);
+
+    return Scaffold(
+      backgroundColor: colorScheme.surface,
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar.medium(
+            leading: const AppBackButton(),
+            title: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: categoryColor.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Center(
+                    child: Icon(
+                      AppIcons.getIcon(category.icon),
+                      color: categoryColor,
+                      size: 20,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Flexible(
+                  child: Text(
+                    category.name,
+                    style: theme.textTheme.headlineLarge?.copyWith(
+                      fontSize:
+                          (theme.textTheme.headlineLarge?.fontSize ?? 32) + 3,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.5,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'MONTHLY SPENDING',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      letterSpacing: 1.2,
+                      fontWeight: FontWeight.w900,
+                      color: colorScheme.onSurface.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Chart Card
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: colorScheme.surfaceContainerLow,
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    child: AspectRatio(
+                      aspectRatio: 1.7,
+                      child: statsAsync.when(
+                        data: (stats) {
+                          if (stats.isEmpty) {
+                            return Center(
+                              child: Text(
+                                'No spending data available',
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            );
+                          }
+
+                          final maxY = stats.isEmpty
+                              ? 100.0
+                              : stats
+                                  .map((e) => e.value)
+                                  .reduce((a, b) => a > b ? a : b);
+
+                          return BarChart(
+                            BarChartData(
+                              alignment: BarChartAlignment.spaceAround,
+                              maxY: maxY == 0 ? 100 : maxY * 1.2,
+                              barTouchData: const BarTouchData(enabled: true),
+                              titlesData: FlTitlesData(
+                                show: true,
+                                bottomTitles: AxisTitles(
+                                  sideTitles: SideTitles(
+                                    showTitles: true,
+                                    getTitlesWidget: (value, meta) {
+                                      final index = value.toInt();
+                                      if (index < 0 || index >= stats.length) {
+                                        return const SizedBox.shrink();
+                                      }
+                                      return Padding(
+                                        padding:
+                                            const EdgeInsets.only(top: 8.0),
+                                        child: Text(
+                                          DateFormat('MMM')
+                                              .format(stats[index].key),
+                                          style: theme.textTheme.bodySmall
+                                              ?.copyWith(
+                                            color: colorScheme.onSurfaceVariant,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                leftTitles: const AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false)),
+                                topTitles: const AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false)),
+                                rightTitles: const AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false)),
+                              ),
+                              gridData: const FlGridData(show: false),
+                              borderData: FlBorderData(show: false),
+                              barGroups: stats.asMap().entries.map((entry) {
+                                return BarChartGroupData(
+                                  x: entry.key,
+                                  barRods: [
+                                    BarChartRodData(
+                                      toY: entry.value.value,
+                                      color: categoryColor,
+                                      width: 16,
+                                      borderRadius: const BorderRadius.vertical(
+                                          top: Radius.circular(8)),
+                                    ),
+                                  ],
+                                );
+                              }).toList(),
+                            ),
+                          );
+                        },
+                        loading: () =>
+                            const Center(child: CircularProgressIndicator()),
+                        error: (err, stack) =>
+                            Center(child: Text('Error: $err')),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 28),
+                  Text(
+                    'TRANSACTION HISTORY',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      letterSpacing: 1.2,
+                      fontWeight: FontWeight.w900,
+                      color: colorScheme.onSurface.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                ],
+              ),
+            ),
+          ),
+          allTransactionsAsync.when(
+            data: (transactions) {
+              final categoryTxs = transactions
+                  .where((t) => t.category.value?.id == category.id)
+                  .toList();
+
+              if (categoryTxs.isEmpty) {
+                return SliverToBoxAdapter(
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(32.0),
+                      child: Text(
+                        'No transactions for this category yet',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }
+
+              return SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 48),
+                sliver: SliverTransactionGroupedList(
+                  transactions: categoryTxs,
+                  onTap: (tx) => context.push('/add_transaction', extra: tx),
+                ),
+              );
+            },
+            loading: () => const SliverToBoxAdapter(
+                child: Center(child: CircularProgressIndicator())),
+            error: (err, stack) =>
+                SliverToBoxAdapter(child: Center(child: Text('Error: $err'))),
+          ),
+        ],
+      ),
+    );
+  }
+}

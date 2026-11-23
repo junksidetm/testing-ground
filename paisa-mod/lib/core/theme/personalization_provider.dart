@@ -1,0 +1,322 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:convert';
+import 'dart:async';
+import '../database/providers.dart';
+
+class PersonalizationState {
+  final double grade;
+  final double weight;
+  final double slant;
+  final double width;
+  final double roundness;
+  final double fontRoundness;
+  final double opticalSize;
+  final bool fillIcons;
+  final bool shouldRestartOnCurrencyChange;
+  final String colorSchemeVariant;
+  final bool isOnboardingComplete;
+  final String? userName;
+  final String? userPhoto;
+  final String? defaultCurrency;
+  final bool isBalanceVisible;
+  final bool vibrateOnTransaction;
+  final bool useGoogleSansFlex;
+  final String iconStyle; // 'Outlined', 'Rounded', 'Sharp'
+
+  final bool useDynamicColor;
+  final bool isErrorCollectorEnabled;
+  final bool isExpressiveDiversificationEnabled;
+  final String selectedExpressiveShape; // 'squircle', 'petal', 'starburst', 'scallop', 'pill', 'asymmetric'
+  final bool isWalletFlexEnabled;
+
+  PersonalizationState({
+    this.grade = 50,
+    this.weight = 400,
+    this.slant = 0,
+    this.width = 100,
+    this.roundness = 32,
+    this.fontRoundness = 100,
+    this.opticalSize = 12,
+    this.fillIcons = false,
+    this.shouldRestartOnCurrencyChange = true,
+    this.colorSchemeVariant = 'vibrant',
+    this.isOnboardingComplete = false,
+    this.useDynamicColor = true,
+    this.isErrorCollectorEnabled = false,
+    this.isExpressiveDiversificationEnabled = true,
+    this.selectedExpressiveShape = 'squircle',
+    this.isWalletFlexEnabled = false,
+    this.userName,
+    this.userPhoto,
+    this.defaultCurrency,
+    this.isBalanceVisible = true,
+    this.vibrateOnTransaction = true,
+    this.useGoogleSansFlex = true,
+    this.iconStyle = 'Rounded',
+  });
+
+  PersonalizationState copyWith({
+    double? grade,
+    double? weight,
+    double? slant,
+    double? width,
+    double? roundness,
+    double? fontRoundness,
+    double? opticalSize,
+    bool? fillIcons,
+    bool? shouldRestartOnCurrencyChange,
+    String? colorSchemeVariant,
+    bool? isOnboardingComplete,
+    bool? useDynamicColor,
+    bool? isErrorCollectorEnabled,
+    bool? isExpressiveDiversificationEnabled,
+    String? selectedExpressiveShape,
+    bool? isWalletFlexEnabled,
+    String? userName,
+    String? userPhoto,
+    String? defaultCurrency,
+    bool? isBalanceVisible,
+    bool? vibrateOnTransaction,
+    bool? useGoogleSansFlex,
+    String? iconStyle,
+  }) {
+    return PersonalizationState(
+      grade: grade ?? this.grade,
+      weight: weight ?? this.weight,
+      slant: slant ?? this.slant,
+      width: width ?? this.width,
+      roundness: roundness ?? this.roundness,
+      fontRoundness: fontRoundness ?? this.fontRoundness,
+      opticalSize: opticalSize ?? this.opticalSize,
+      fillIcons: fillIcons ?? this.fillIcons,
+      shouldRestartOnCurrencyChange: shouldRestartOnCurrencyChange ?? this.shouldRestartOnCurrencyChange,
+      colorSchemeVariant: colorSchemeVariant ?? this.colorSchemeVariant,
+      isOnboardingComplete: isOnboardingComplete ?? this.isOnboardingComplete,
+      useDynamicColor: useDynamicColor ?? this.useDynamicColor,
+      isErrorCollectorEnabled: isErrorCollectorEnabled ?? this.isErrorCollectorEnabled,
+      isExpressiveDiversificationEnabled: isExpressiveDiversificationEnabled ?? this.isExpressiveDiversificationEnabled,
+      selectedExpressiveShape: selectedExpressiveShape ?? this.selectedExpressiveShape,
+      isWalletFlexEnabled: isWalletFlexEnabled ?? this.isWalletFlexEnabled,
+      userName: userName ?? this.userName,
+      userPhoto: userPhoto ?? this.userPhoto,
+      defaultCurrency: defaultCurrency ?? this.defaultCurrency,
+      isBalanceVisible: isBalanceVisible ?? this.isBalanceVisible,
+      vibrateOnTransaction: vibrateOnTransaction ?? this.vibrateOnTransaction,
+      useGoogleSansFlex: useGoogleSansFlex ?? this.useGoogleSansFlex,
+      iconStyle: iconStyle ?? this.iconStyle,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'grade': grade,
+      'weight': weight,
+      'slant': slant,
+      'width': width,
+      'roundness': roundness,
+      'fontRoundness': fontRoundness,
+      'opticalSize': opticalSize,
+      'fillIcons': fillIcons,
+      'shouldRestartOnCurrencyChange': shouldRestartOnCurrencyChange,
+      'colorSchemeVariant': colorSchemeVariant,
+      'isOnboardingComplete': isOnboardingComplete,
+      'useDynamicColor': useDynamicColor,
+      'isErrorCollectorEnabled': isErrorCollectorEnabled,
+      'isExpressiveDiversificationEnabled': isExpressiveDiversificationEnabled,
+      'selectedExpressiveShape': selectedExpressiveShape,
+      'isWalletFlexEnabled': isWalletFlexEnabled,
+      'userName': userName,
+      'userPhoto': userPhoto,
+      'defaultCurrency': defaultCurrency,
+      'isBalanceVisible': isBalanceVisible,
+      'vibrateOnTransaction': vibrateOnTransaction,
+      'useGoogleSansFlex': useGoogleSansFlex,
+      'iconStyle': iconStyle,
+    };
+  }
+
+  factory PersonalizationState.fromMap(Map<String, dynamic> map) {
+    return PersonalizationState(
+      grade: (map['grade'] as num?)?.toDouble() ?? 50,
+      weight: (map['weight'] as num?)?.toDouble() ?? 400,
+      slant: (map['slant'] as num?)?.toDouble() ?? 0,
+      width: (map['width'] as num?)?.toDouble() ?? 100,
+      roundness: (map['roundness'] as num?)?.toDouble() ?? 32,
+      fontRoundness: (map['fontRoundness'] as num?)?.toDouble() ?? 100,
+      opticalSize: (map['opticalSize'] as num?)?.toDouble() ?? 12,
+      fillIcons: map['fillIcons'] as bool? ?? false,
+      shouldRestartOnCurrencyChange: map['shouldRestartOnCurrencyChange'] as bool? ?? true,
+      colorSchemeVariant: map['colorSchemeVariant'] as String? ?? 'vibrant',
+      isOnboardingComplete: map['isOnboardingComplete'] as bool? ?? false,
+      useDynamicColor: map['useDynamicColor'] as bool? ?? true,
+      isErrorCollectorEnabled: map['isErrorCollectorEnabled'] as bool? ?? false,
+      isExpressiveDiversificationEnabled: map['isExpressiveDiversificationEnabled'] as bool? ?? true,
+      selectedExpressiveShape: map['selectedExpressiveShape'] as String? ?? 'squircle',
+      isWalletFlexEnabled: map['isWalletFlexEnabled'] as bool? ?? false,
+      userName: map['userName'] as String?,
+      userPhoto: map['userPhoto'] as String?,
+      defaultCurrency: map['defaultCurrency'] as String?,
+      isBalanceVisible: map['isBalanceVisible'] as bool? ?? true,
+      vibrateOnTransaction: map['vibrateOnTransaction'] as bool? ?? true,
+      useGoogleSansFlex: map['useGoogleSansFlex'] as bool? ?? true,
+      iconStyle: map['iconStyle'] as String? ?? 'Rounded',
+    );
+  }
+}
+
+class PersonalizationNotifier extends Notifier<PersonalizationState> {
+  static const _key = 'personalization_v1';
+  Timer? _debounceTimer;
+
+  @override
+  PersonalizationState build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    final jsonStr = prefs.getString(_key);
+    if (jsonStr != null) {
+      try {
+        return PersonalizationState.fromMap(json.decode(jsonStr));
+      } catch (e) {
+        return PersonalizationState();
+      }
+    }
+    return PersonalizationState();
+  }
+
+  void _save() {
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(const Duration(milliseconds: 500), () async {
+      final prefs = ref.read(sharedPreferencesProvider);
+      await prefs.setString(_key, json.encode(state.toMap()));
+    });
+  }
+
+  void toggleFillIcons() {
+    state = state.copyWith(fillIcons: !state.fillIcons);
+    _save();
+  }
+
+  void toggleVibration() {
+    state = state.copyWith(vibrateOnTransaction: !state.vibrateOnTransaction);
+    _save();
+  }
+
+  void toggleGoogleSans(bool value) {
+    state = state.copyWith(useGoogleSansFlex: value);
+    _save();
+  }
+
+  void toggleRestartOnCurrencyChange(bool value) {
+    state = state.copyWith(shouldRestartOnCurrencyChange: value);
+    _save();
+  }
+
+  void toggleBalanceVisibility() {
+    state = state.copyWith(isBalanceVisible: !state.isBalanceVisible);
+    _save();
+  }
+
+  void completeOnboarding({String? name, String? currency, String? photo}) {
+    state = state.copyWith(
+      isOnboardingComplete: true,
+      userName: name,
+      defaultCurrency: currency,
+      userPhoto: photo,
+    );
+    _save();
+  }
+
+  void updateProfile({String? name, String? photo}) {
+    state = state.copyWith(userName: name, userPhoto: photo);
+    _save();
+  }
+
+  void updateCurrency(String currency) {
+    state = state.copyWith(defaultCurrency: currency);
+    _save();
+  }
+
+  void updateColorSchemeVariant(String variant) {
+    state = state.copyWith(colorSchemeVariant: variant);
+    _save();
+  }
+
+  void updateGrade(double v) { state = state.copyWith(grade: v); _save(); }
+  void updateWeight(double v) { state = state.copyWith(weight: v); _save(); }
+  void updateSlant(double v) { state = state.copyWith(slant: v); _save(); }
+  void updateWidth(double v) { state = state.copyWith(width: v); _save(); }
+  void updateRoundness(double v) { state = state.copyWith(roundness: v); _save(); }
+  void updateFontRoundness(double v) { state = state.copyWith(fontRoundness: v); _save(); }
+  void updateOpticalSize(double v) { state = state.copyWith(opticalSize: v); _save(); }
+  
+  void resetTypography() {
+    state = state.copyWith(
+      grade: 50,
+      weight: 400,
+      slant: 0,
+      width: 100,
+      roundness: 32,
+      fontRoundness: 100,
+      opticalSize: 12,
+      colorSchemeVariant: 'vibrant',
+    );
+    _save();
+  }
+
+  void enableErrorCollector() {
+    state = state.copyWith(isErrorCollectorEnabled: true);
+    _save();
+  }
+
+  void toggleErrorCollector() {
+    state = state.copyWith(isErrorCollectorEnabled: !state.isErrorCollectorEnabled);
+    _save();
+  }
+
+  void setExpressiveShape(String shape) {
+    state = state.copyWith(selectedExpressiveShape: shape);
+    _save();
+  }
+
+  void toggleWalletFlex([bool? value]) {
+    final enabled = value ?? !state.isWalletFlexEnabled;
+    if (enabled) {
+      state = state.copyWith(
+        isWalletFlexEnabled: true,
+        grade: 50,
+        weight: 585,
+        width: 120,
+        roundness: 19,
+        fontRoundness: 19,
+        opticalSize: 68,
+      );
+    } else {
+      state = state.copyWith(
+        isWalletFlexEnabled: false,
+        grade: 50,
+        weight: 400,
+        width: 100,
+        roundness: 32,
+        fontRoundness: 100,
+        opticalSize: 12,
+      );
+    }
+    _save();
+  }
+
+  void toggleExpressiveDiversification([bool? value]) {
+    state = state.copyWith(
+      isExpressiveDiversificationEnabled: value ?? !state.isExpressiveDiversificationEnabled,
+    );
+    _save();
+  }
+
+  void reset() {
+    state = PersonalizationState();
+    _save();
+  }
+}
+
+final personalizationProvider =
+    NotifierProvider<PersonalizationNotifier, PersonalizationState>(() {
+  return PersonalizationNotifier();
+});

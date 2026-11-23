@@ -36,6 +36,15 @@ Each application in this repository is maintained inside its own self-contained 
 " width=250>
 </p>
 
+
+### 3. [paisa-mod/](paisa-mod/)
+* **Type:** Personal Finance & Expense Manager (Clean-Room Mod & Incubation Lab)
+* **Framework:** Flutter + Isar Community DB + Material 3 Expressive
+* **Package ID:** `dev.hemanths.paisa.unrestricted`
+* **Current Version:** `v6.0.0`
+* **Artifact:** `Paisa-Unrestricted-v6.0.0.apk`
+* **Description:** Clean-room privacy-first expense tracker with zero PairIP tamper locks, zero paywalls, local Wi-Fi Desktop Web Companion (`port 8080`), authentic Google Sans Flex variable typography, and unrestricted accounts, budgets, and goals.
+
 ## 🚀 Universal Multi-App Release Model
 
 This repository employs a unified multi-application delivery model:

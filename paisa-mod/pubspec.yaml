@@ -1,0 +1,139 @@
+name: paisa_mod
+description: Unrestricted, Privacy-First Personal Finance Manager (Clean-Room Mod).
+publish_to: 'none'
+
+version: 6.0.0+60000
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State Management
+  flutter_riverpod: 2.5.1
+  riverpod_annotation: 2.3.5
+
+  # Storage
+  shared_preferences: 2.2.2
+  flutter_secure_storage: 10.0.0
+
+  # Database
+  isar: ^3.1.0+1
+  isar_flutter_libs: ^3.1.0+1
+  path_provider: 2.1.2
+
+  # UI
+  flutter_animate: 4.5.0
+  flutter_staggered_animations: ^1.1.1
+  animations: ^2.0.11
+  fl_chart: 1.1.1
+  google_fonts: 8.0.1
+  flutter_svg: 2.0.10+1
+  intl: 0.20.2
+  cupertino_icons: 1.0.8
+  uuid: ^4.5.1
+  decimal: ^3.0.1
+  freezed_annotation: ^2.4.4
+  flutter_local_notifications: ^21.0.0
+  timezone: ^0.11.0
+  
+  # Theming & Icons (Paisa Replica)
+  flex_color_picker: ^3.8.0
+  material_symbols_icons: ^4.27.6
+  flutter_material_design_icons: ^3.1.0+7447
+  font_awesome_flutter: ^11.0.0
+  dynamic_color: ^1.7.0
+
+  # Security (Phase 13)
+  local_auth: ^2.3.0
+
+  # File / Permissions
+  csv: 6.0.0
+  permission_handler: ^12.0.1
+  file_picker: ^8.0.0
+  path: ^1.9.0
+  open_filex: ^4.4.0
+  flutter_markdown: ^0.7.1
+  url_launcher: ^6.2.6
+  http: ^1.6.0
+  dio: ^5.7.0
+  rxdart: ^0.28.0
+
+  # Feedback (Phase 14)
+  vibration: ^3.1.8
+  go_router: ^17.1.0
+  device_info_plus: ^11.5.0
+  image_picker: ^1.2.1
+  image_cropper: ^8.0.2
+  ota_update: ^7.1.0
+  package_info_plus: ^9.0.0
+  restart_app: ^1.7.3
+  smooth_page_indicator: ^2.0.1
+  flutter_heatmap_calendar: ^1.0.5
+  archive: ^4.0.9
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  analyzer: ^6.4.1
+
+  flutter_lints: 4.0.0
+  flutter_launcher_icons: ^0.14.4
+
+  # Code Generation
+  build_runner: 2.4.13
+  isar_generator:
+    path: isar_community/packages/isar_generator
+  riverpod_generator: 2.4.0
+
+dependency_overrides:
+  isar:
+    path: isar_community/packages/isar
+  isar_flutter_libs:
+    path: isar_community/packages/isar_flutter_libs
+ 
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/
+    - assets/web_companion/
+    - assets/fonts/
+    - assets/onboarding/
+    - assets/images/
+    - assets/images/blueprint.svg
+    - assets/icon/
+    - assets/metadata/
+
+  fonts:
+    - family: GoogleSansFlex
+      fonts:
+        - asset: assets/fonts/GoogleSansFlex/google_sans_flex.ttf
+
+    - family: AppleColorEmoji
+      fonts:
+        - asset: assets/fonts/Emoji/iOS15.4_Fixed_space.ttf
+
+    # Icon fonts come from material_symbols_icons, flutter_material_design_icons
+    # and font_awesome_flutter (bundled under packages/...). The duplicate
+    # families that used to be declared here (~35 MB) were never referenced.
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  remove_alpha_ios: true
+  # 1. Android Legacy / Package Installer: High-res PNG
+  image_path_android: "assets/icon/original.png" 
+  
+  # 2. iOS Icon: High-res PNG
+  image_path_ios: "assets/icon/original.png"
+  
+  # 3. Adaptive Background (Used by Android Home Screen)
+  adaptive_icon_background: "#FFFFFF" 
+  
+  # 4. Adaptive Foreground (Used by Android Home Screen): PNG for tool compatibility
+  adaptive_icon_foreground: "assets/icon/original.png"
+  adaptive_icon_monochrome: "assets/icon/monochrome.png"
+
