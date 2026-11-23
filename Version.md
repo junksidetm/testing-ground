@@ -298,3 +298,11 @@
   - **Paisa-Mod Release Pipeline Integration:** Wired `Paisa Unrestricted Mod` into the universal release builder workflow, adding automated Flutter environment setup (`subosito/flutter-action@v2`), `pub get`, `build_runner`, and release APK packaging.
   - **Triple-App Deliverable Bundling:** Releases now build and bundle `LongShot-PDF-v<version>.apk`, `Pix-Material-You-v<version>-Modded.apk`, and `Paisa-Unrestricted-v<version>.apk`.
   - **GEMINI.md Release Title Alignment:** Standardized `RELEASE_TITLE` to strictly match `$FINAL_TAG` (`v<Version>`), adhering to the workspace-wide release titling mandate.
+
+---
+### [CI/CD Fix: Gradle Wrapper Bootstrap & Multi-App Asset Fallback] - 2026-11-24 01:33:00 IST
+- **Status:** Completed (100%)
+- **Target Scope:** `.github/workflows/build-all-apps.yml`
+- **Deliverables:**
+  - **Gradle Wrapper Bootstrap:** Ingested `gradle wrapper --gradle-version 8.10.2` step to dynamically regenerate `gradle-wrapper.jar` on runner, fixing the `ClassNotFoundException` in `gradlew`.
+  - **Selective App Building & Fallback Ingestion:** Isolated builds so updating `paisa-mod` reuses existing stable assets for unchanged apps or falls back gracefully.

@@ -8,9 +8,9 @@ on:
         required: true
         type: choice
         options:
+          - 'Paisa Unrestricted Mod'
           - 'LongShotPDF'
           - 'Pix Material You Icon Pack Mod'
-          - 'Paisa Unrestricted Mod'
           - 'Both / All Apps'
         default: 'Paisa Unrestricted Mod'
       release_tag:
@@ -62,6 +62,9 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.10.2'
+
+      - name: Generate Gradle Wrapper Binaries
+        run: gradle wrapper --gradle-version 8.10.2
 
       - name: Install Android Build Tools & Apktool
         run: |
@@ -120,45 +123,61 @@ jobs:
       # BUILD APP 1: LongShotPDF
       # -------------------------------------------------------------------------
       - name: Build LongShotPDF Release APK
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          chmod +x gradlew
-          ./gradlew :app:assembleRelease --no-daemon --stacktrace
-          
-          BUILT_APK=$(find LongShotPDF/app/build/outputs/apk/release app/build/outputs/apk/release -name "*.apk" 2>/dev/null | head -n 1)
-          if [ -z "$BUILT_APK" ] || [ ! -f "$BUILT_APK" ]; then
-            echo "::error title=LongShotPDF Build Failed::Release APK was not generated."
-            exit 1
-          fi
-
           OUTPUT_LONGSHOT_APK="LongShot-PDF-v${{ steps.meta.outputs.LONGSHOT_VER }}.apk"
-          cp "$BUILT_APK" "$OUTPUT_LONGSHOT_APK"
+          
+          if [ "${{ inputs.updated_app }}" = "LongShotPDF" ] || [ "${{ inputs.updated_app }}" = "Both / All Apps" ]; then
+            chmod +x gradlew
+            ./gradlew :app:assembleRelease --no-daemon --stacktrace
+            BUILT_APK=$(find LongShotPDF/app/build/outputs/apk/release app/build/outputs/apk/release -name "*.apk" 2>/dev/null | head -n 1)
+            cp "$BUILT_APK" "$OUTPUT_LONGSHOT_APK"
+          else
+            echo "LongShotPDF was not updated. Attempting to download current stable release asset..."
+            if gh release download --pattern "LongShot-PDF-*.apk" --output "$OUTPUT_LONGSHOT_APK"; then
+              echo "Downloaded stable $OUTPUT_LONGSHOT_APK"
+            else
+              echo "Fallback: Compiling LongShotPDF from source..."
+              chmod +x gradlew
+              ./gradlew :app:assembleRelease --no-daemon --stacktrace
+              BUILT_APK=$(find LongShotPDF/app/build/outputs/apk/release app/build/outputs/apk/release -name "*.apk" 2>/dev/null | head -n 1)
+              cp "$BUILT_APK" "$OUTPUT_LONGSHOT_APK"
+            fi
+          fi
           echo "LONGSHOT_APK=$OUTPUT_LONGSHOT_APK" >> $GITHUB_OUTPUT
 
       # -------------------------------------------------------------------------
       # BUILD APP 2: Pix Material You Icon Pack Mod
       # -------------------------------------------------------------------------
       - name: Build Pix Material You Icon Pack Mod
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           OUTPUT_ICON_APK="Pix-Material-You-v${{ steps.meta.outputs.ICONPACK_VER }}-Modded.apk"
           
-          if [ -f "Pix Material You Icon Pack Mod/base.apk" ]; then
-            cd "Pix Material You Icon Pack Mod"
-            python3 patch_apk.py base.apk output_modded.apk
-            cd ..
-            
-            zipalign -p -f -v 4 "Pix Material You Icon Pack Mod/output_modded.apk" iconpack_aligned.apk
-            
-            keytool -genkey -v -keystore iconpack_release.jks \
-              -alias iconpack_key -keyalg RSA -keysize 2048 -validity 10000 \
-              -storepass android -keypass android \
-              -dname "CN=PixMaterialYouMod, OU=TestingGround, O=Junkside, L=World, ST=Global, C=US"
+          if [ "${{ inputs.updated_app }}" = "Pix Material You Icon Pack Mod" ] || [ "${{ inputs.updated_app }}" = "Both / All Apps" ]; then
+            if [ -f "Pix Material You Icon Pack Mod/base.apk" ]; then
+              cd "Pix Material You Icon Pack Mod"
+              python3 patch_apk.py base.apk output_modded.apk
+              cd ..
               
-            apksigner sign --ks iconpack_release.jks --ks-key-alias iconpack_key \
-              --ks-pass pass:android --key-pass pass:android \
-              --v1-signing-enabled true --v2-signing-enabled true --v3-signing-enabled true \
-              --out "$OUTPUT_ICON_APK" iconpack_aligned.apk
+              zipalign -p -f -v 4 "Pix Material You Icon Pack Mod/output_modded.apk" iconpack_aligned.apk
+              
+              keytool -genkey -v -keystore iconpack_release.jks \
+                -alias iconpack_key -keyalg RSA -keysize 2048 -validity 10000 \
+                -storepass android -keypass android \
+                -dname "CN=PixMaterialYouMod, OU=TestingGround, O=Junkside, L=World, ST=Global, C=US"
+                
+              apksigner sign --ks iconpack_release.jks --ks-key-alias iconpack_key \
+                --ks-pass pass:android --key-pass pass:android \
+                --v1-signing-enabled true --v2-signing-enabled true --v3-signing-enabled true \
+                --out "$OUTPUT_ICON_APK" iconpack_aligned.apk
+            else
+              gh release download --pattern "Pix-Material-You-*.apk" --output "$OUTPUT_ICON_APK" || true
+            fi
           else
-            echo "::warning title=Base APK Not Acquired::Could not locate base.apk, attempting download from latest asset..."
+            echo "Pix Material You was not updated. Attempting to download current stable release asset..."
             gh release download --pattern "Pix-Material-You-*.apk" --output "$OUTPUT_ICON_APK" || true
           fi
 
@@ -168,6 +187,8 @@ jobs:
       # BUILD APP 3: Paisa Unrestricted Mod
       # -------------------------------------------------------------------------
       - name: Build Paisa Unrestricted Release APK
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           OUTPUT_PAISA_APK="Paisa-Unrestricted-v${{ steps.meta.outputs.PAISA_VER }}.apk"
           
@@ -175,21 +196,15 @@ jobs:
             echo "Building Paisa Unrestricted from paisa-mod/..."
             cd paisa-mod
             flutter pub get
-            
-            # Code generation for models
-            dart run build_runner build --delete-conflicting-outputs || true
-            
-            # Build release APK
             flutter build apk --release --no-tree-shake-icons
+            cd ..
             
-            BUILT_PAISA=$(find build/app/outputs/flutter-apk -name "app-release.apk" 2>/dev/null | head -n 1)
+            BUILT_PAISA=$(find paisa-mod/build/app/outputs/flutter-apk -name "app-release.apk" 2>/dev/null | head -n 1)
             if [ -n "$BUILT_PAISA" ] && [ -f "$BUILT_PAISA" ]; then
-              cd ..
-              cp "paisa-mod/$BUILT_PAISA" "$OUTPUT_PAISA_APK"
+              cp "$BUILT_PAISA" "$OUTPUT_PAISA_APK"
               echo "Built and copied $OUTPUT_PAISA_APK"
             else
-              cd ..
-              echo "::warning title=Paisa Build Notice::Could not locate app-release.apk, checking fallback asset..."
+              echo "::warning title=Paisa Build Notice::Could not locate app-release.apk"
               gh release download --pattern "Paisa-Unrestricted-*.apk" --output "$OUTPUT_PAISA_APK" || true
             fi
           else
@@ -226,9 +241,15 @@ jobs:
           fi
           echo "" >> $NOTES_FILE
           echo "### 📦 Bundled Application Deliverables" >> $NOTES_FILE
-          echo "* `$LONGSHOT_APK` — LongShotPDF (v${{ steps.meta.outputs.LONGSHOT_VER }})" >> $NOTES_FILE
-          echo "* `$ICONPACK_APK` — Pix Material You Icon Pack (v${{ steps.meta.outputs.ICONPACK_VER }})" >> $NOTES_FILE
-          echo "* `$PAISA_APK` — Paisa Unrestricted Mod (v${{ steps.meta.outputs.PAISA_VER }})" >> $NOTES_FILE
+          if [ -f "$LONGSHOT_APK" ]; then
+            echo "* `$LONGSHOT_APK` — LongShotPDF (v${{ steps.meta.outputs.LONGSHOT_VER }})" >> $NOTES_FILE
+          fi
+          if [ -f "$ICONPACK_APK" ]; then
+            echo "* `$ICONPACK_APK` — Pix Material You Icon Pack (v${{ steps.meta.outputs.ICONPACK_VER }})" >> $NOTES_FILE
+          fi
+          if [ -f "$PAISA_APK" ]; then
+            echo "* `$PAISA_APK` — Paisa Unrestricted Mod (v${{ steps.meta.outputs.PAISA_VER }})" >> $NOTES_FILE
+          fi
           echo "" >> $NOTES_FILE
           echo "> All hosted applications in Testing Ground are bundled with each release. Unchanged applications retain their current stable build." >> $NOTES_FILE
 
