@@ -8,7 +8,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/widgets/transaction_segmented_group.dart';
 import '../../../core/widgets/icon_picker.dart';
 import '../../../core/widgets/app_back_button.dart';
-import 'package:wallet/core/theme/color_extension.dart';
+import '../../../core/theme/color_extension.dart';
 
 class CategoryDetailsPage extends ConsumerWidget {
   final Category category;

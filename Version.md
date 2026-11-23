@@ -306,3 +306,11 @@
 - **Deliverables:**
   - **Gradle Wrapper Bootstrap:** Ingested `gradle wrapper --gradle-version 8.10.2` step to dynamically regenerate `gradle-wrapper.jar` on runner, fixing the `ClassNotFoundException` in `gradlew`.
   - **Selective App Building & Fallback Ingestion:** Isolated builds so updating `paisa-mod` reuses existing stable assets for unchanged apps or falls back gracefully.
+
+---
+### [Bug Fix: Package Import Resolution in CategoryDetailsPage] - 2026-11-24 01:42:00 IST
+- **Status:** Completed (100%)
+- **Target Scope:** `paisa-mod/lib/features/reports/pages/category_details_page.dart`
+- **Deliverables:**
+  - Replaced stale absolute package import `package:wallet/core/theme/color_extension.dart` with standard relative import `../../../core/theme/color_extension.dart`, resolving Dart kernel snapshot compilation failure during Flutter AOT release build.
+  - Made release APK output path resolution in `build-all-apps.yml` robust using `find paisa-mod/build -name "*release*.apk"`.

@@ -199,7 +199,7 @@ jobs:
             flutter build apk --release --no-tree-shake-icons
             cd ..
             
-            BUILT_PAISA=$(find paisa-mod/build/app/outputs/flutter-apk -name "app-release.apk" 2>/dev/null | head -n 1)
+            BUILT_PAISA=$(find paisa-mod/build -name "*release*.apk" 2>/dev/null | head -n 1)
             if [ -n "$BUILT_PAISA" ] && [ -f "$BUILT_PAISA" ]; then
               cp "$BUILT_PAISA" "$OUTPUT_PAISA_APK"
               echo "Built and copied $OUTPUT_PAISA_APK"
