@@ -334,3 +334,12 @@
 - **Published Deliverables:**
   - `Paisa-Unrestricted-v6.0.0.apk`: Clean-room unrestricted personal finance manager with embedded local Desktop Web Companion on port 8080, Google Sans Flex variable typography, and zero anti-tamper/paywall locks.
   - `LongShot-PDF-v1.1.0.apk`: Bundled stable companion APK for LongShotPDF.
+
+---
+### [OPPO Photos Morphe Clone Pipeline v17.10.10] - 2026-11-27 13:48:00 IST
+- **Status:** In Progress (Pipeline Created & Pending CI Build Verification)
+- **Target Scope:** `Oppo-Photos-Mod/` & `.github/workflows/build-oppo-photos.yml`
+- **Base App:** Stock `com.coloros.gallery3d` `17.10.10` (`versionCode 17010010`) -> Isolated clone package `morphe.coloros.gallery3d`
+- **Summary:**
+  - Created `Oppo-Photos-Mod/patch_gallery.py` implementing binary AXML manifest patching (package rename, relative component expansion, `.gallery.morphe` isolation for 38 ContentProvider authorities and 8 declared permissions without corrupting `resources.arsc` or overlapping provider class names) and smali literal rewriting for authorities, permissions, `content://` URIs, router allowlists, and scoped `/Android/data/` paths.
+  - Added `.github/workflows/build-oppo-photos.yml` using `apktool d -r` / `apktool b`, `zipalign`, and `apksigner` (v1/v2/v3) on GitHub Actions.

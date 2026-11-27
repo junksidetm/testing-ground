@@ -1,0 +1,167 @@
+name: Build & Sign OPPO Photos Morphe Clone
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_tag:
+        description: 'Release tag hosting the stock OPPO Photos base APK asset'
+        required: false
+        default: 'v17.10.0'
+      release_tag:
+        description: 'Output semantic version tag (must strictly match v<Version>)'
+        required: false
+        default: 'v17.10.10'
+      create_release:
+        description: 'Publish/Attach signed clone APK to GitHub Release'
+        type: boolean
+        default: false
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-oppo-photos:
+    name: Patch Smali & Manifest + Sign APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Install Android Build Tools & Apktool
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y zipalign apksigner aapt unzip zip
+          echo "Installing Apktool 2.10.0..."
+          sudo wget -q https://raw.githubusercontent.com/iBotPeaches/Apktool/master/scripts/linux/apktool -O /usr/local/bin/apktool
+          sudo wget -q https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_2.10.0.jar -O /usr/local/bin/apktool.jar
+          sudo chmod +x /usr/local/bin/apktool /usr/local/bin/apktool.jar
+          apktool --version
+
+      - name: Download Base OPPO Photos APK
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p base_download/
+          gh release download "${{ inputs.base_tag }}" --pattern "*.apk" --dir base_download/
+          FOUND_APK=$(find base_download/ -type f -name "*.apk" | head -n 1)
+          if [ -z "$FOUND_APK" ] || [ ! -s "$FOUND_APK" ]; then
+            echo "::error title=Missing Base APK::Could not download base APK from tag ${{ inputs.base_tag }}."
+            exit 1
+          fi
+          mv "$FOUND_APK" base.apk
+          echo "Acquired base.apk ($(stat -c%s base.apk) bytes)"
+
+      - name: Decompile DEX & Patch Manifest + Smali
+        run: |
+          export _JAVA_OPTIONS="-Xmx8g"
+          echo "Decompiling classes*.dex (keeping raw resources.arsc/res intact)..."
+          apktool d -r -f base.apk -o decompiled_apk
+
+          echo "Running Morphe clone patcher..."
+          python3 "Oppo-Photos-Mod/patch_gallery.py" decompiled_apk
+
+          # Keep clean backup of patched binary manifest in case apktool b touches original/
+          cp decompiled_apk/AndroidManifest.xml patched_AndroidManifest.xml
+
+      - name: Rebuild APK via Apktool
+        run: |
+          export _JAVA_OPTIONS="-Xmx8g"
+          apktool b decompiled_apk -o unaligned.apk
+
+          # Ensure our patched binary AndroidManifest.xml is placed intact and strip stale v1 signatures only
+          python3 - <<'PY'
+          import zipfile, os
+          src = "unaligned.apk"
+          tmp = "unaligned_fixed.apk"
+          sig_files = {"META-INF/MANIFEST.MF"}
+          with zipfile.ZipFile(src, "r") as zin, zipfile.ZipFile(tmp, "w") as zout:
+              for info in zin.infolist():
+                  name = info.filename
+                  if name == "AndroidManifest.xml":
+                      continue
+                  if name in sig_files or (
+                      name.startswith("META-INF/")
+                      and not name.startswith("META-INF/services/")
+                      and name.upper().endswith((".SF", ".RSA", ".DSA", ".EC"))
+                  ):
+                      continue
+                  data = zin.read(name)
+                  zi = zipfile.ZipInfo(name)
+                  zi.compress_type = info.compress_type
+                  zout.writestr(zi, data)
+              # Store AndroidManifest.xml with standard deflate
+              manifest_data = open("patched_AndroidManifest.xml", "rb").read()
+              zi = zipfile.ZipInfo("AndroidManifest.xml")
+              zi.compress_type = zipfile.ZIP_DEFLATED
+              zout.writestr(zi, manifest_data)
+          os.replace(tmp, src)
+          print("Verified AndroidManifest.xml injection & stripped stale signature entries.")
+          PY
+
+      - name: Zipalign 4-byte Page Alignment
+        run: |
+          zipalign -p -f -v 4 unaligned.apk aligned.apk > /dev/null
+          zipalign -c -v 4 aligned.apk > /dev/null
+          echo "zipalign 4-byte page alignment verified."
+
+      - name: Sign APK (v1, v2, and v3 schemes)
+        run: |
+          keytool -genkey -v -keystore release.jks \
+            -alias oppo_photos_morphe \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -storepass android \
+            -keypass android \
+            -dname "CN=OppoPhotosMorphe, OU=AndroidMod, O=Junkside, L=World, ST=Global, C=US"
+
+          OUT_APK="Oppo-Photos-${{ inputs.release_tag }}-Morphe.apk"
+          apksigner sign --ks release.jks \
+            --ks-key-alias oppo_photos_morphe \
+            --ks-pass pass:android \
+            --key-pass pass:android \
+            --v1-signing-enabled true \
+            --v2-signing-enabled true \
+            --v3-signing-enabled true \
+            --out "$OUT_APK" \
+            aligned.apk
+
+          apksigner verify --verbose --print-certs "$OUT_APK"
+          aapt dump badging "$OUT_APK" | head -n 25
+          echo "Checking zero unmorphed OPPO Gallery authorities remain in APK manifest:"
+          ! aapt dump xmltree "$OUT_APK" AndroidManifest.xml | grep -E 'android:authorities=.*"(com\.oplus\.gallery|com\.coloros\.gallery3d|com\.oppo\.gallery3d|com\.open\.gallery|com\.oplus\.dcc\.provider\.TrackContentProvider)"'
+
+      - name: Upload Cloned APK as Workflow Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: "Oppo-Photos-${{ inputs.release_tag }}-Morphe"
+          path: "Oppo-Photos-${{ inputs.release_tag }}-Morphe.apk"
+          if-no-files-found: error
+
+      - name: Publish APK to GitHub Release
+        if: ${{ inputs.create_release }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          APK_FILE="Oppo-Photos-${{ inputs.release_tag }}-Morphe.apk"
+          if gh release view "${{ inputs.release_tag }}" &>/dev/null; then
+            gh release upload "${{ inputs.release_tag }}" "$APK_FILE" --clobber
+          else
+            gh release create "${{ inputs.release_tag }}" "$APK_FILE" --title "${{ inputs.release_tag }}" --notes "Morphe clone build of OPPO Photos (${{ inputs.release_tag }}) with isolated package, authorities, and permissions."
+          fi
