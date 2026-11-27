@@ -343,3 +343,13 @@
 - **Summary:**
   - Created `Oppo-Photos-Mod/patch_gallery.py` implementing binary AXML manifest patching (package rename, relative component expansion, `.gallery.morphe` isolation for 38 ContentProvider authorities and 8 declared permissions without corrupting `resources.arsc` or overlapping provider class names) and smali literal rewriting for authorities, permissions, `content://` URIs, router allowlists, and scoped `/Android/data/` paths.
   - Added `.github/workflows/build-oppo-photos.yml` using `apktool d -r` / `apktool b`, `zipalign`, and `apksigner` (v1/v2/v3) on GitHub Actions.
+
+---
+### [OPPO Photos Morphe Clone v17.10.10 Verification] - 2026-11-27 14:02:00 IST
+- **Status:** Completed (100% Built on CI & Verified on RMX3780 Device)
+- **Target Scope:** `Oppo-Photos-Mod/patch_gallery.py`, `.github/workflows/build-oppo-photos.yml`
+- **Workflow Run:** [Run #45965348092](https://github.com/junksidetm/testing-ground/actions/runs/45965348092) (2m 01s)
+- **Verification Results:**
+  - Binary AXML & Smali Patcher: `{'package': 1, 'authorities': 38, 'permissions': 17, 'metadata_uris': 3}` and `285` smali string rewrites across `177` files (`17` dex folders / `114,195` smali files scanned).
+  - Signed APK: `Oppo-Photos-v17.10.10-Morphe.apk` (`396,130,092` bytes, `zipalign` 4-byte page-aligned, `apksigner` v3 verified).
+  - Device Verification (`95H6KNVWKV6XU8ZT`, Android 15 / RMX3780): Cleanly installed side-by-side (`morphe.coloros.gallery3d`, `versionCode 17010010`) alongside stock `com.coloros.gallery3d` (`15.80.18_sp1`), launched `MainActivity` & `SettingsActivity` smoothly with zero crash logcat entries (`logcat -b crash -d` empty).
